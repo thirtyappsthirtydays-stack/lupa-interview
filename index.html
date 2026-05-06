@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lupa · Billing</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,sans-serif;background:#f5f4f0;color:#1a1917;min-height:100vh;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f9f8f5;
+  --border:#e8e5de;--border-strong:#d0ccc3;
+  --t1:#1a1917;--t2:#6b6560;--t3:#a39e97;
+  --red:#b91c1c;--rs:#fef2f2;--rb:#fecaca;
+  --amb:#92400e;--as:#fffbeb;--ab:#fde68a;
+  --grn:#166534;--gs:#f0fdf4;--gb:#bbf7d0;
+  --blu:#1e40af;--bs:#eff6ff;--bb:#bfdbfe;
+  --r:6px;--rl:10px;--rp:100px;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────────────── */
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:50}
+.tb-logo{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#1a1917;padding-right:24px;border-right:1px solid var(--border);margin-right:4px}
+.tb-logo svg{width:18px;height:18px;color:#6d4df2;flex-shrink:0}
+.tb-nav{display:flex;gap:1px;flex:1;padding-left:8px}
+.tbn{padding:5px 10px;border-radius:5px;font-size:13px;color:var(--t2);border:none;background:none;transition:all .15s}
+.tbn:hover{color:var(--t1);background:var(--bg)}
+.tbn.active{color:var(--t1);font-weight:500;background:var(--bg)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.tb-clinic{font-size:12px;color:var(--t3)}
+.tb-notif{position:relative;width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.tb-notif:hover{background:var(--bg);color:var(--t1)}
+.tb-notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#ef4444;border:1.5px solid #fff}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:#6d4df2;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────── */
+.page{max-width:1140px;margin:0 auto;padding:16px 24px 60px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.page-head-left h1{font-size:22px;font-weight:700;letter-spacing:-.03em;margin-top:2px}
+.page-head-left p{font-size:12px;color:var(--t3);margin-top:2px}
+.page-back-row{display:flex;align-items:center;gap:5px;margin-bottom:20px}
+.page-back-btn{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:500;color:var(--t3);background:none;border:none;padding:0;cursor:pointer;font-family:inherit;transition:color .15s}
+.page-back-btn:hover{color:var(--t1)}
+.page-back-sep{font-size:12px;color:var(--border-strong)}
+.page-back-current{font-size:12px;font-weight:500;color:var(--t2)}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;margin-top:0}
+.tab-item{padding:10px 16px;font-size:13px;font-weight:500;color:var(--t3);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab-item:hover{color:var(--t2)}
+.tab-item.active{color:var(--t1);border-bottom-color:#1a1917}
+
+/* ── BUTTONS ──────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:500;border:none;transition:all .15s;white-space:nowrap;cursor:pointer}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-xs{padding:3px 9px;font-size:11px;font-weight:500}
+.btn-dark{background:#1a1917;color:#fff}.btn-dark:hover{background:#2d2b27}
+.btn-outline{background:var(--surface);color:var(--t2);border:1px solid var(--border)}.btn-outline:hover{border-color:var(--border-strong);color:var(--t1)}
+.btn-grn{background:var(--gs);color:var(--grn);border:1px solid var(--gb)}.btn-grn:hover{background:#dcfce7}
+.btn-blu{background:var(--bs);color:var(--blu);border:1px solid var(--bb)}.btn-blu:hover{background:#dbeafe}
+.btn-amb{background:var(--as);color:var(--amb);border:1px solid var(--ab)}
+.btn-active-filter{background:#1a1917;color:#fff;border:1px solid #1a1917}
+
+/* ── METRICS ──────────────────────────────────────────────────────── */
+/* ── SMART SUMMARY ────────────────────────────────────────────────── */
+.smart-summary{margin-bottom:22px}
+/* Total line */
+.ss-total{display:flex;align-items:baseline;gap:16px;padding:18px 22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:10px}
+.ss-total-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);white-space:nowrap}
+.ss-total-amount{font-size:36px;font-weight:700;letter-spacing:-.04em;color:var(--t1);line-height:1}
+.ss-total-meta{display:flex;gap:14px;margin-left:auto;align-items:center}
+.ss-total-meta-item{font-size:12px;color:var(--t3)}
+.ss-total-meta-item strong{color:var(--t2);font-weight:600}
+/* Smart cards row */
+.ss-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ss-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative;overflow:hidden}
+.ss-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ss-card.c-unpaid::before{background:var(--red)}
+.ss-card.c-uncontacted::before{background:#3b82f6}
+.ss-card.c-credit::before{background:var(--grn)}
+.ss-card.c-waiting::before{background:var(--amb)}
+.ss-card:hover{border-color:var(--border-strong);box-shadow:0 4px 14px rgba(0,0,0,.07);transform:translateY(-1px)}
+.ss-card:active{transform:translateY(0)}
+.ss-card-eyebrow{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px;margin-top:4px}
+.ss-card-amount{font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+.ss-card-amount.red{color:var(--red)}
+.ss-card-amount.blu{color:#2563eb}
+.ss-card-amount.grn{color:var(--grn)}
+.ss-card-amount.amb{color:var(--amb)}
+.ss-card-desc{font-size:12px;color:var(--t3);margin-top:6px;line-height:1.4}
+.ss-card-desc strong{color:var(--t2);font-weight:500}
+.ss-card-action{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-size:11px;font-weight:600;color:var(--t2)}
+.ss-card-action svg{transition:transform .15s}
+.ss-card:hover .ss-card-action svg{transform:translateX(3px)}
+.ss-card-action.red{color:var(--red)}
+.ss-card-action.blu{color:#2563eb}
+.ss-card-action.grn{color:var(--grn)}
+.ss-card-action.amb{color:var(--amb)}
+
+/* ── SUGGESTIONS ──────────────────────────────────────────────────── */
+.suggestions{margin-bottom:20px}
+.sug-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;user-select:none}
+.sug-header:hover .sug-title{color:var(--t1)}
+.sug-title{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;transition:color .15s}
+.sug-count{background:var(--bg);border:1px solid var(--border);border-radius:var(--rp);padding:1px 8px;font-size:11px;font-weight:600;color:var(--t2)}
+.sug-chev{font-size:10px;color:var(--t3);transition:transform .15s;margin-left:2px}
+.sug-chev.open{transform:rotate(90deg)}
+.sug-cards{display:flex;gap:8px;flex-wrap:nowrap}
+.sg-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.sg-card:hover{border-color:var(--border-strong);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.sg-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+.sg-body{flex:1;min-width:0}
+.sg-title{font-size:12px;font-weight:500;color:var(--t1);line-height:1.4;margin-bottom:3px;white-space:normal}
+.sg-sub{font-size:11px;color:var(--t3);line-height:1.5;white-space:normal}
+.sg-arrow{color:var(--t3);font-size:13px;flex-shrink:0;transition:transform .15s;margin-top:2px}
+.sg-card:hover .sg-arrow{transform:translateX(3px);color:var(--t2)}
+
+/* ── VIEWS STRIP ──────────────────────────────────────────────────── */
+/* ── CUSTOM VIEWS PANEL ───────────────────────────────────────────── */
+.cv-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:12px;overflow:hidden}
+.cv-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;user-select:none;transition:background .1s}
+.cv-panel-header:hover{background:var(--surface2)}
+.cv-panel-header-left{display:flex;align-items:center;gap:8px}
+.cv-panel-header-right{display:flex;align-items:center;gap:8px}
+.cv-panel-title{font-size:12px;font-weight:600;color:var(--t1)}
+.cv-panel-count{background:var(--bg);border:1px solid var(--border);border-radius:var(--rp);padding:1px 8px;font-size:11px;font-weight:600;color:var(--t2)}
+.cv-active-label{font-size:12px;color:var(--t3)}
+.cv-active-label strong{color:#6d4df2;font-weight:500}
+.cv-chev{font-size:9px;color:var(--t3);transition:transform .15s}
+.cv-chev.open{transform:rotate(90deg)}
+.cv-panel-body{border-top:1px solid var(--border);display:none}
+.cv-panel-body.open{display:block}
+.cv-split{display:grid;grid-template-columns:280px 1fr;gap:0}
+.cv-filter-col{border-right:1px solid var(--border);padding:16px}
+.cv-filter-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px}
+.cv-filter-field{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;transition:border-color .15s}
+.cv-filter-field:hover{border-color:var(--border-strong)}
+.cv-filter-field.active{border-color:#6d4df2;background:#f5f3ff}
+.cv-ff-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px}
+.cv-filter-select{width:100%;border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--t1);background:var(--surface);outline:none;cursor:pointer;transition:border-color .15s}
+.cv-filter-select:focus{border-color:#6d4df2}
+.cv-filter-footer{display:flex;gap:7px;margin-top:14px}
+.cv-views-col{padding:16px}
+.cv-views-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px}
+.cv-view-item{border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:7px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10px}
+.cv-view-item:last-child{margin-bottom:0}
+.cv-view-item:hover{border-color:var(--border-strong);background:var(--surface2)}
+.cv-view-item.active{border-color:#6d4df2;background:#f5f3ff}
+.cv-view-item-body{flex:1;min-width:0}
+.cv-view-name{font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
+.cv-view-desc{font-size:11px;color:var(--t3);margin-top:3px}
+.cv-default-badge{font-size:10px;font-weight:600;background:var(--gs);color:var(--grn);border-radius:var(--rp);padding:1px 7px;white-space:nowrap}
+.cv-view-actions{display:flex;gap:5px;flex-shrink:0;align-items:flex-start}
+.cv-view-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:0;line-height:1;transition:color .15s}
+.cv-view-del:hover{color:var(--red)}
+.cv-star{background:none;border:none;cursor:pointer;font-size:13px;padding:0;line-height:1;color:var(--t3);transition:color .15s}
+.cv-star.starred{color:#f59e0b}
+.cv-star:hover{color:#f59e0b}
+.cv-footer-note{font-size:11px;color:var(--t3);font-style:italic;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2)}
+/* Keep save-view-btn for modal trigger */
+.save-view-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r);font-size:12px;font-weight:500;border:1px dashed var(--border-strong);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s}
+.save-view-btn:hover{color:var(--t1);border-color:var(--t2)}
+.save-view-btn:disabled{opacity:.4;cursor:default}
+
+/* ── TABLE SHELL ──────────────────────────────────────────────────── */
+.tbl-shell{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.tbl-toolbar{display:flex;align-items:center;gap:7px;padding:11px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tbl-search{position:relative;flex:1;max-width:260px;min-width:160px}
+.tbl-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px;pointer-events:none}
+.tbl-search input{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:var(--r);padding:6px 10px 6px 28px;font-size:13px;color:var(--t1);outline:none;transition:border-color .15s}
+.tbl-search input:focus{border-color:#6d4df2;background:var(--surface)}
+.tbl-search input::placeholder{color:var(--t3)}
+
+/* Group-by toggle */
+/* ── TABLE TOP BAR ───────────────────────────────────────────────── */
+.tbl-top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap;gap:10px}
+.tbl-top-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbl-top-right{display:flex;align-items:center;gap:8px}
+.tbl-ctrl-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.tbl-ctrl-divider{width:1px;height:16px;background:var(--border-strong);flex-shrink:0;margin:0 4px}
+.tbl-seg-btns{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:2px;gap:2px}
+.tsb{padding:4px 12px;border-radius:4px;font-size:12px;font-weight:500;border:none;background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tsb:hover{color:var(--t1)}
+.tsb.active{background:var(--surface);color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.tbl-sort-select{border:1px solid var(--border);background:var(--surface);border-radius:var(--r);padding:5px 9px;font-size:12px;color:var(--t1);outline:none;cursor:pointer;transition:border-color .15s}
+.tbl-sort-select:focus{border-color:#6d4df2}
+/* ── GROUP SUMMARY CARDS ──────────────────────────────────────────── */
+.grp-summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.grp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;position:relative}
+.grp-card:hover{border-color:var(--border-strong);box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.grp-card.active{border-color:#1a1917;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.grp-card-stripe{height:3px;width:100%;flex-shrink:0}
+.grp-card-body{padding:12px 14px 10px;flex:1}
+.grp-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t2);margin-bottom:4px}
+.grp-card-amount{font-size:20px;font-weight:700;letter-spacing:-.025em;color:var(--t1);line-height:1;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.grp-card-meta{font-size:11px;color:var(--t3);margin-bottom:4px}
+.grp-card-hint{font-size:11px;color:var(--t3);font-style:italic}
+.grp-card-chev{position:absolute;bottom:10px;right:12px;font-size:9px;color:var(--t3);transition:transform .15s}
+.grp-card-chev.open{transform:rotate(180deg)}
+/* Expanded group table */
+.grp-table-shell{border-top:1px solid var(--border)}
+.grp-table-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+.grp-table-head-left{display:flex;align-items:center;gap:6px}
+.grp-table-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.grp-table-sub{font-size:12px;color:var(--t3)}
+.grp-table-close{background:none;border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+.grp-table-close:hover{border-color:var(--border-strong);color:var(--t1)}
+/* Pagination */
+.grp-pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2)}
+.grp-pg-info{font-size:12px;color:var(--t3)}
+.grp-pg-btns{display:flex;gap:4px}
+.grp-pg-btn{padding:4px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+.grp-pg-btn:hover:not(:disabled){border-color:var(--border-strong);color:var(--t1)}
+.grp-pg-btn.active{background:#1a1917;color:#fff;border-color:#1a1917}
+.grp-pg-btn:disabled{opacity:.35;cursor:default}
+/* By-invoice flat row */
+.inv-flat-row{display:grid;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);transition:background .1s;cursor:default}
+.inv-flat-row:hover{background:var(--surface2)}
+.inv-flat-row:last-child{border-bottom:none}
+
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+
+/* Active filter chips row */
+.filter-chips-row{display:flex;align-items:center;gap:6px;padding:7px 16px;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap}
+.filter-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--rp);font-size:11px;font-weight:500;background:#1a1917;color:#fff}
+.filter-chip-x{font-size:13px;opacity:.7;cursor:pointer;line-height:1;margin-left:2px}
+.filter-chip-x:hover{opacity:1}
+.clear-all-link{font-size:11px;color:var(--t3);cursor:pointer;margin-left:4px;text-decoration:underline}
+.clear-all-link:hover{color:var(--t1)}
+
+/* ── FILTER DROPDOWN ──────────────────────────────────────────────── */
+.filter-btn-wrap{position:relative}
+.filter-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:var(--border-strong);color:var(--t1)}
+.filter-btn.has-filters{background:#1a1917;color:#fff;border-color:#1a1917}
+.filter-count-badge{min-width:16px;height:16px;border-radius:var(--rp);background:rgba(255,255,255,.25);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
+.filter-panel{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 32px rgba(0,0,0,.12);z-index:60;width:260px;display:none}
+.filter-panel.open{display:block}
+.fp-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.fp-header-title{font-size:12px;font-weight:600;color:var(--t1)}
+.fp-clear{font-size:11px;color:var(--t3);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.fp-clear:hover{color:var(--red)}
+.fp-section{padding:12px 14px;border-bottom:1px solid var(--border)}
+.fp-section:last-child{border-bottom:none}
+.fp-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
+.fp-check-item{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer}
+.fp-check-item input[type=checkbox]{accent-color:#6d4df2;width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.fp-check-item label{font-size:13px;color:var(--t1);cursor:pointer;flex:1}
+.fp-age-btns{display:flex;gap:4px;flex-wrap:wrap}
+.fp-age-btn{padding:4px 10px;border-radius:var(--rp);font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--t2);cursor:pointer;transition:all .15s}
+.fp-age-btn:hover{border-color:var(--border-strong);color:var(--t1)}
+.fp-age-btn.active{border-color:#1a1917;background:#1a1917;color:#fff}
+
+/* Column picker */
+.col-picker-wrap{position:relative}
+.col-picker-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s}
+.col-picker-btn:hover{border-color:var(--border-strong);color:var(--t1)}
+.col-picker-dd{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:60;min-width:190px;padding:6px 0;display:none}
+.col-picker-dd.open{display:block}
+.cpd-item{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;transition:background .1s}
+.cpd-item:hover{background:var(--bg)}
+.cpd-item input{accent-color:#6d4df2;flex-shrink:0}
+.cpd-item label{font-size:13px;color:var(--t1);cursor:pointer;flex:1}
+.cpd-item.locked{opacity:.4;pointer-events:none}
+.cpd-divider{height:1px;background:var(--border);margin:4px 0}
+
+/* ── GROUP HEADERS ────────────────────────────────────────────────── */
+.grp-hd{display:flex;align-items:center;gap:10px;padding:9px 16px;background:var(--bg);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .1s}
+.grp-hd:hover{background:#eceae5}
+.grp-hd-chev{font-size:9px;color:var(--t3);transition:transform .15s;flex-shrink:0}
+.grp-hd-chev.open{transform:rotate(90deg)}
+.grp-hd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.grp-hd-name{font-size:12px;font-weight:600;color:var(--t1);flex:1}
+.grp-hd-meta{font-size:12px;color:var(--t3)}
+.grp-hd-amt{font-size:13px;font-weight:600;color:var(--t1);margin-left:4px}
+
+/* ── TABLE ────────────────────────────────────────────────────────── */
+.tbl-head,.c-row-main,.inv-sub-row-grid{display:grid;align-items:center;gap:0}
+.tbl-head{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.th.r{text-align:right}
+.th-tip{display:inline-flex;width:13px;height:13px;border-radius:50%;background:var(--bg);border:1px solid var(--border);align-items:center;justify-content:center;font-size:8px;color:var(--t3);cursor:help;margin-left:3px}
+
+.c-row{border-bottom:1px solid var(--border)}
+.c-row:last-child{border-bottom:none}
+.c-row-main{padding:11px 16px;cursor:pointer;transition:background .1s;overflow:hidden}
+.c-row-main:hover{background:var(--surface2)}
+.c-row-main:hover .exp-hint{opacity:1}
+
+.exp-col{display:flex;align-items:center;gap:5px}
+.exp-chev{width:16px;height:16px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:8px;flex-shrink:0;transition:all .15s;background:var(--surface)}
+.c-row-main:hover .exp-chev{border-color:var(--border-strong);color:var(--t2)}
+.exp-chev.open{transform:rotate(90deg);border-color:#6d4df2;color:#6d4df2}
+.exp-hint{font-size:10px;color:var(--t3);white-space:nowrap;opacity:0;transition:opacity .15s}
+.exp-hint.open{opacity:1;color:#6d4df2}
+
+.c-name-cell{display:flex;align-items:center;gap:6px;min-width:0}
+.c-name{font-size:13px;font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex-shrink:1}
+.chip{display:inline-flex;align-items:center;padding:1px 7px;border-radius:var(--rp);font-size:10px;font-weight:500;flex-shrink:0}
+.i-pill{font-size:10px;color:var(--accent,#6d4df2);background:var(--accent-soft,#f5f3ff);border:1px solid var(--accent-border,#ddd6fe);border-radius:var(--rp);padding:1px 7px;white-space:nowrap;flex-shrink:0}
+.chip-bad{background:var(--rs);color:var(--red)}
+
+.tv{font-size:13px;color:var(--t1);text-align:right}
+.tv.red{color:var(--red);font-weight:500}
+.tv.grn{color:var(--grn);font-weight:500}
+.tv.muted{color:var(--t3);font-size:12px}
+.tv-age{font-size:12px;font-weight:500;text-align:right}
+.tv-contact{font-size:11px;color:var(--t2);text-align:right}
+.tv-contact-sub{font-size:10px;color:var(--t3);margin-top:2px;text-align:right}
+
+.row-actions{display:flex;justify-content:flex-end}
+.act-dd-wrap{position:relative}
+.act-dd-btn{white-space:nowrap}
+.act-dd{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:200;min-width:180px;padding:4px 0;display:none}
+.act-dd.open{display:block}
+.act-dd-item{display:flex;align-items:center;gap:7px;width:100%;padding:8px 14px;border:none;background:none;font-size:13px;color:var(--t1);cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.act-dd-item:hover{background:var(--surface2)}
+.act-dd-item.grn{color:var(--grn)}
+
+/* Invoice expand */
+.inv-expand{background:var(--surface2);border-top:1px solid var(--border)}
+.inv-sub-head{padding:7px 16px 7px 40px;border-bottom:1px solid var(--border);background:#eeece7}
+.inv-sub-row-grid{padding:8px 16px 8px 40px;border-bottom:1px solid var(--border)}
+.inv-sub-row-grid:last-child{border-bottom:none}
+.inv-th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.inv-th.r,.inv-td.r{text-align:right}
+.inv-td{font-size:12px;color:var(--t2)}
+.inv-td.num{color:var(--t3);font-size:11px}
+.inv-td.bold{color:var(--t1);font-weight:500}
+.ins-chip{display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:3px}
+.ins-draft{background:var(--as);color:var(--amb)}
+.ins-insurer{background:var(--bs);color:var(--blu)}
+
+.tbl-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2)}
+.tbl-footer span{font-size:12px;color:var(--t3)}
+
+.empty-state{padding:48px 24px;text-align:center;color:var(--t3);font-size:13px}
+.empty-state p{margin-top:8px;font-size:12px}
+
+/* ── STATEMENTS ───────────────────────────────────────────────────── */
+.stmt-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.stmt-bar-title{font-size:16px;font-weight:600;letter-spacing:-.015em;margin-right:8px}
+/* Date range picker */
+.date-range{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.dr-label{padding:6px 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);background:var(--bg);border-right:1px solid var(--border);white-space:nowrap}
+.dr-input{border:none;outline:none;padding:6px 10px;font-size:12px;color:var(--t1);background:var(--surface);width:120px}
+.dr-sep{padding:0 6px;color:var(--t3);font-size:12px;background:var(--surface)}
+.dr-input:focus{background:#f5f3ff}
+.dr-presets{display:flex;gap:3px}
+.dr-preset{padding:5px 11px;border-radius:var(--rp);font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.dr-preset:hover{border-color:var(--border-strong);color:var(--t1)}
+.dr-preset.active{border-color:#1a1917;background:#1a1917;color:#fff}
+/* Statement table */
+.stmt-shell{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.stmt-toolbar{display:flex;align-items:center;gap:7px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.stmt-count{font-size:12px;color:var(--t2);font-weight:500}
+/* Column sort/filter headers */
+.stmt-col-grid{display:grid;grid-template-columns:36px 28px 220px 1fr 1fr 1fr 120px;gap:0;align-items:center}
+.stmt-head{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.stmt-th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;transition:color .1s}
+.stmt-th:hover{color:var(--t1)}
+.stmt-th.r{justify-content:flex-end}
+.stmt-th.sorted{color:var(--t1)}
+.sort-icon{font-size:10px;color:var(--t3);flex-shrink:0}
+.stmt-th-filter{position:relative;display:inline-flex;align-items:center}
+.col-filter-dot{width:5px;height:5px;border-radius:50%;background:#6d4df2;position:absolute;top:-1px;right:-1px}
+/* Client rows */
+.sc-row{border-bottom:1px solid var(--border)}
+.sc-row:last-child{border-bottom:none}
+.sc-main{padding:11px 16px;cursor:pointer;transition:background .1s}
+.sc-main:hover{background:var(--surface2)}
+.sc-exp-chev{width:16px;height:16px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:8px;flex-shrink:0;transition:all .15s;background:var(--surface)}
+.sc-main:hover .sc-exp-chev{border-color:var(--border-strong);color:var(--t2)}
+.sc-exp-chev.open{transform:rotate(90deg);border-color:#6d4df2;color:#6d4df2}
+.sc-name-cell{display:flex;align-items:center;gap:7px;min-width:0}
+.sc-name{font-size:13px;font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-email{font-size:11px;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-val{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.sc-val.red{color:var(--red);font-weight:500}
+.sc-val.grn{color:var(--grn);font-weight:500}
+.sc-val.muted{color:var(--t3)}
+.sc-actions{display:flex;gap:4px;justify-content:flex-end;padding-left:12px}
+/* Invoice sub-rows */
+.sc-inv-expand{background:var(--surface2);border-top:1px solid var(--border)}
+.sc-inv-grid{display:grid;grid-template-columns:36px 80px 1fr 90px 90px 70px 180px;gap:0;align-items:center}
+.sc-inv-head{padding:7px 16px;border-bottom:1px solid var(--border);background:#eeece7}
+.sc-inv-row{padding:8px 16px;border-bottom:1px solid var(--border)}
+.sc-inv-row:last-child{border-bottom:none}
+.sc-inv-th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.sc-inv-th.r{text-align:right}
+.sc-inv-td{font-size:12px;color:var(--t2)}
+.sc-inv-td.num{font-size:11px;color:var(--t3)}
+.sc-inv-td.r{text-align:right}
+.sc-inv-td.bold{color:var(--t1);font-weight:500}
+/* Column filter dropdown */
+.col-filter-wrap{position:relative;display:inline-flex}
+.col-filter-dd{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:60;min-width:180px;padding:8px 0;display:none}
+.col-filter-dd.open{display:block}
+.cfd-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--t1);transition:background .1s}
+.cfd-item:hover{background:var(--bg)}
+.cfd-item input[type=checkbox]{accent-color:#6d4df2;flex-shrink:0}
+.cfd-search{display:flex;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.cfd-search input{width:100%;border:none;outline:none;font-size:12px;color:var(--t1);background:transparent}
+.cfd-search input::placeholder{color:var(--t3)}
+.stmt-footer{padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between}
+/* Command bar */
+.stmt-cmd-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:11px 16px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s}
+.stmt-cmd-bar:focus-within{border-color:#6d4df2;box-shadow:0 0 0 3px rgba(109,77,242,.08)}
+.stmt-cmd-icon{color:var(--t3);flex-shrink:0}
+.stmt-cmd-input{flex:1;border:none;outline:none;font-size:14px;color:var(--t1);background:transparent;min-width:0}
+.stmt-cmd-input::placeholder{color:var(--t3)}
+.stmt-cmd-hint{font-size:12px;color:var(--t3);white-space:nowrap;flex-shrink:0}
+.stmt-cmd-hint em{font-style:normal;color:var(--t2)}
+.stmt-cmd-results{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.scr-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border)}
+.scr-item:last-child{border-bottom:none}
+.scr-item:hover{background:var(--surface2)}
+.scr-item-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.scr-item-body{flex:1}
+.scr-item-title{font-size:13px;font-weight:500;color:var(--t1)}
+.scr-item-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.icon-btn{width:28px;height:28px;border-radius:var(--r-sm,5px);border:1px solid var(--border);background:var(--surface);color:var(--t2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0;position:relative}
+.icon-btn:hover{border-color:var(--border-strong);color:var(--t1);background:var(--surface2)}
+.sc-name-link{cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--border-strong);color:var(--t1);transition:text-decoration-color .15s}
+.sc-name-link:hover{text-decoration-color:var(--t1)}
+
+/* Statement preview */
+.sp{font-family:Georgia,serif;padding:32px;background:#fff;line-height:1.5}
+.sp-name{font-size:20px;font-weight:700;color:#111;margin-bottom:2px}
+.sp-addr{font-size:12px;color:#666;margin-bottom:24px}
+.sp-rule{border:none;border-top:2px solid #111;margin:14px 0}
+.sp-rule-light{border:none;border-top:1px solid #ddd;margin:10px 0}
+.sp-period{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:6px}
+.sp-title{font-size:22px;font-weight:700;color:#111;margin-bottom:20px}
+.sp-client-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:4px}
+.sp-client-name{font-size:16px;font-weight:600;color:#111}
+.sp-client-email{font-size:12px;color:#666;margin-bottom:24px}
+.sp-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px}
+.sp-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#888;border-bottom:1px solid #111;padding:6px 0;font-weight:600}
+.sp-table th.r,.sp-table td.r{text-align:right}
+.sp-table td{padding:7px 0;border-bottom:1px solid #eee;color:#333;vertical-align:top}
+.sp-table td.bold{font-weight:600;color:#111}
+.sp-totals{background:#f8f8f6;border:1px solid #ddd;border-radius:6px;padding:14px 16px;margin-top:16px}
+.sp-total-row{display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:6px}
+.sp-total-row.final{font-size:15px;font-weight:700;color:#111;border-top:1px solid #ddd;padding-top:8px;margin-top:6px;margin-bottom:0}
+.sp-footer{margin-top:28px;font-size:11px;color:#888;border-top:1px solid #ddd;padding-top:14px;line-height:1.7}
+
+/* ── EXPANDED ROW TABS ────────────────────────────────────────────── */
+.exp-tabs{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--surface);padding:0 16px;gap:0}
+.exp-tab{padding:8px 14px;font-size:12px;font-weight:500;border:none;background:none;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:5px}
+.exp-tab:hover{color:var(--t2)}
+.exp-tab.active{color:var(--t1);border-bottom-color:#1a1917}
+.exp-tab-count{background:var(--bg);border:1px solid var(--border);border-radius:var(--rp);padding:0px 6px;font-size:10px;font-weight:600;color:var(--t3)}
+.exp-tabs-right{margin-left:auto;font-size:11px;color:var(--t3)}
+/* Activity feed in expanded row */
+.al-feed{padding:4px 0}
+.al-item{display:flex;gap:0;padding:10px 16px 10px 24px}
+.al-dot-col{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;margin-right:12px}
+.al-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.al-line{width:1px;background:var(--border);flex:1;min-height:12px;margin:3px 0}
+.al-content{flex:1;min-width:0;padding-top:2px}
+.al-header{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.al-date{font-size:11px;font-weight:600;color:var(--t2)}
+.al-sep{color:var(--border-strong);font-size:11px}
+.al-title{font-size:12px;font-weight:600;color:var(--t1)}
+.al-by{font-size:11px;color:var(--t3);margin-left:auto}
+.al-undo{font-size:10px;font-weight:600;background:none;border:1px solid var(--border);border-radius:var(--rp);padding:1px 8px;cursor:pointer;color:var(--t3);transition:all .15s;font-family:inherit}
+.al-undo:hover{border-color:var(--red);color:var(--red)}
+.al-detail{font-size:12px;color:var(--t3);line-height:1.5}
+.al-footer{display:flex;align-items:center;gap:6px;padding:8px 16px;border-top:1px solid var(--border);background:var(--surface2)}
+/* ── GLOBAL ACTIVITY LOG TAB ──────────────────────────────────────── */
+.al-page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.al-page-title{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.al-page-sub{font-size:12px;color:var(--t3);margin-top:3px}
+.al-filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.al-filter-select{border:1px solid var(--border);background:var(--surface);border-radius:var(--r);padding:7px 10px;font-size:13px;color:var(--t1);outline:none;cursor:pointer;transition:border-color .15s}
+.al-filter-select:focus{border-color:#6d4df2}
+.al-global-shell{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.alg-client-block{border-bottom:1px solid var(--border)}
+.alg-client-block:last-child{border-bottom:none}
+.alg-client-head{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--surface2);cursor:pointer;transition:background .1s;user-select:none}
+.alg-client-head:hover{background:var(--bg)}
+.alg-client-chev{font-size:9px;color:var(--t3);transition:transform .15s}
+.alg-client-chev.open{transform:rotate(90deg)}
+.alg-client-name{font-size:13px;font-weight:600;color:var(--t1);flex:1}
+.alg-client-meta{font-size:11px;color:var(--t3)}
+.alg-feed{padding:4px 0;background:var(--surface)}
+.alg-empty{padding:32px 24px;text-align:center;color:var(--t3);font-size:13px}
+.al-global-footer{padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--t3)}
+.auto-page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.auto-page-title{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.auto-page-sub{font-size:12px;color:var(--t3);margin-top:3px}
+.auto-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.auto-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;flex-direction:column;overflow:visible}
+.auto-card-head{display:flex;align-items:flex-start;gap:12px;padding:16px 18px 14px;border-bottom:1px solid var(--border)}
+.auto-card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.auto-card-head-text{flex:1;min-width:0}
+.auto-card-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:4px;letter-spacing:-.01em}
+.auto-card-desc{font-size:12px;color:var(--t3);line-height:1.5}
+.auto-card-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:10px;overflow:visible}
+.auto-card-foot{padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.auto-rule-summary{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;flex:1}
+.auto-rule-row{display:flex;align-items:center;gap:10px}
+.auto-rule-label{font-size:12px;font-weight:500;color:var(--t2);min-width:100px;flex-shrink:0}
+.auto-select{border:1px solid var(--border);border-radius:var(--r);padding:5px 8px;font-size:12px;color:var(--t1);background:var(--surface);outline:none;cursor:pointer;transition:border-color .15s;flex:1;min-width:0}
+.auto-select:focus{border-color:#6d4df2}
+.auto-select-sm{flex:1;min-width:0}
+.auto-num-input{border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--t1);background:var(--surface);outline:none;width:60px;text-align:center;transition:border-color .15s}
+.auto-num-input:focus{border-color:#6d4df2}
+.auto-sequence{display:flex;flex-direction:column;gap:8px}
+.auto-seq-step{display:flex;align-items:center;gap:8px}
+.auto-seq-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.auto-seq-label{font-size:12px;font-weight:500;color:var(--t2);display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap}
+.auto-add-step{margin-top:4px;background:none;border:1px dashed var(--border-strong);border-radius:var(--r);padding:5px 12px;font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;transition:all .15s;text-align:center}
+.auto-add-step:hover{border-color:var(--t2);color:var(--t2)}
+.auto-toggle{position:relative;display:inline-flex;flex-shrink:0;cursor:pointer}
+.auto-toggle input{opacity:0;width:0;height:0;position:absolute}
+.auto-toggle-track{display:inline-block;width:36px;height:20px;background:var(--border-strong);border-radius:var(--rp);transition:background .2s;position:relative}
+.auto-toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.auto-toggle input:checked + .auto-toggle-track{background:#6d4df2}
+.auto-toggle input:checked + .auto-toggle-track::after{transform:translateX(16px)}
+.auto-footnote{font-size:12px;color:var(--t3);font-style:italic;text-align:center;margin-top:4px}
+/* Approval box */
+.auto-approval-box{background:#fffbeb;border:1px solid var(--ab);border-radius:var(--r);padding:12px 14px;overflow:visible}
+.auto-approval-header{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.auto-approval-icon{font-size:14px;flex-shrink:0}
+.auto-approval-title{font-size:12px;font-weight:600;color:var(--amb)}
+.auto-approval-desc{font-size:12px;color:var(--t2);line-height:1.5}
+
+/* ── MODALS ───────────────────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(26,25,23,.4);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);width:520px;max-width:calc(100vw - 32px);max-height:calc(100vh - 60px);overflow-y:auto;transform:translateY(8px);transition:transform .18s;box-shadow:0 20px 48px rgba(0,0,0,.14)}
+.overlay.open .modal{transform:translateY(0)}
+.modal-lg{width:640px}.modal-xl{width:740px}
+.mh{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1}
+.mh-title{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.mh-sub{font-size:12px;color:var(--t3);margin-top:2px}
+.mh-x{width:26px;height:26px;border-radius:5px;background:var(--bg);border:1px solid var(--border);color:var(--t2);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.mh-x:hover{background:var(--border);color:var(--t1)}
+.mb{padding:16px 20px}
+.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
+.mlabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:8px;margin-top:16px}
+.mlabel:first-child{margin-top:0}
+.minput{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;font-size:13px;color:var(--t1);outline:none;transition:border-color .15s}
+.minput:focus{border-color:#6d4df2}
+textarea.minput{resize:vertical;min-height:90px;line-height:1.6}
+
+/* Save view modal */
+.sv-filter-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.sv-filter-row{font-size:12px;color:var(--t2);margin-bottom:4px;display:flex;gap:8px}
+.sv-filter-row:last-child{margin-bottom:0}
+.sv-filter-key{color:var(--t3);min-width:80px}
+
+/* Note opts */
+.note-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.note-opt{padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;background:var(--surface);text-align:left;transition:all .15s}
+.note-opt:hover{border-color:var(--border-strong);background:var(--surface2)}
+.note-opt.sel{border-color:#6d4df2;background:#f5f3ff}
+.note-opt-icon{font-size:14px;margin-bottom:3px}
+.note-opt-lbl{font-size:12px;font-weight:500;color:var(--t1)}
+.note-opt-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.follow-row{display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.follow-row.show{display:flex;align-items:center;gap:10px}
+.follow-row label{font-size:12px;color:var(--t2);white-space:nowrap;font-weight:500}
+
+/* Payment */
+.pay-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:2px;margin-bottom:16px}
+.pay-tab{flex:1;padding:6px;border-radius:4px;font-size:13px;font-weight:500;border:none;background:none;color:var(--t2);transition:all .15s}
+.pay-tab.active{background:var(--surface);color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.inv-sel-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:5px;cursor:pointer;transition:all .15s}
+.inv-sel-row:hover{border-color:var(--border-strong)}
+.inv-sel-row.on{border-color:#6d4df2;background:#f5f3ff}
+.inv-sel-row input[type=checkbox]{accent-color:#6d4df2;flex-shrink:0}
+.isr-info{flex:1}
+.isr-name{font-size:13px;color:var(--t1)}
+.isr-meta{font-size:11px;color:var(--t3);margin-top:1px}
+.isr-amt{font-size:13px;font-weight:600}
+.pay-sum{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-top:10px}
+.psr{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px}
+.psr.total{font-size:13px;font-weight:600;color:var(--t1);border-top:1px solid var(--border);padding-top:8px;margin-bottom:0;margin-top:4px}
+.psr-v{font-variant-numeric:tabular-nums}
+.psr-v.pos{color:var(--grn)}.psr-v.neg{color:var(--red)}
+
+/* Reminder */
+.email-compose{border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ec-field{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
+.ec-field:last-child{border-bottom:none}
+.ec-lbl{padding:10px 14px;font-size:12px;font-weight:600;color:var(--t3);background:var(--bg);border-right:1px solid var(--border);width:80px;flex-shrink:0;display:flex;align-items:center;text-transform:uppercase;letter-spacing:.04em}
+.ec-val{flex:1;padding:10px 14px;font-size:13px;color:var(--t1);border:none;outline:none;background:var(--surface);width:100%;line-height:1.5}
+textarea.ec-val{resize:vertical;min-height:140px;line-height:1.6}
+.tpl-bar{display:flex;gap:5px;margin-bottom:10px}
+.tpl-opt{flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);background:var(--surface);text-align:center;cursor:pointer;transition:all .15s}
+.tpl-opt:hover{border-color:var(--border-strong);color:var(--t1)}
+.tpl-opt.active{border-color:#6d4df2;color:#6d4df2;background:#f5f3ff}
+
+/* Credits */
+.credit-box{background:var(--gs);border:1px solid var(--gb);border-radius:var(--r);padding:16px}
+.cb-row{display:flex;justify-content:space-between;font-size:13px;color:var(--grn);padding:4px 0}
+.cb-row.total{font-size:15px;font-weight:700;border-top:1px solid var(--gb);margin-top:6px;padding-top:10px}
+
+/* Amount */
+.amt-wrap{display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.amt-wrap:focus-within{border-color:#6d4df2}
+.amt-sym{padding:9px 12px;font-size:14px;font-weight:500;color:var(--t2);background:var(--bg);border-right:1px solid var(--border)}
+.amt-input{border:none;outline:none;padding:9px 12px;font-size:17px;font-weight:600;background:transparent;color:var(--t1);flex:1}
+
+.tab-placeholder{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:28px;text-align:center}
+.tp-icon{font-size:26px;margin-bottom:8px}
+.tp-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.tp-sub{font-size:12px;color:var(--t3);margin-bottom:14px}
+
+/* Toast + tooltip */
+.toast{position:fixed;bottom:20px;right:20px;z-index:300;background:#1a1917;color:#fff;padding:11px 16px;border-radius:var(--r);font-size:13px;font-weight:500;display:none;gap:8px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{display:flex;animation:slideUp .2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ttp{position:fixed;background:#1a1917;color:#e8e6e0;font-size:11px;padding:6px 9px;border-radius:5px;width:160px;line-height:1.5;z-index:400;pointer-events:none;opacity:0;transition:opacity .1s}
+.ttp.v{opacity:1}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <div class="tb-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+    Lupa
+  </div>
+  <div class="tb-nav">
+    <button class="tbn">Calendar</button>
+    <button class="tbn">Appointments</button>
+    <button class="tbn">Pets</button>
+    <button class="tbn">Chats</button>
+    <button class="tbn active">Apps</button>
+    <button class="tbn">Settings</button>
+  </div>
+  <div class="tb-right">
+    <span class="tb-clinic">Paddington Vets · Daniel Turner</span>
+    <button class="tb-notif" onclick="showToast('No new notifications')" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="tb-notif-dot"></span>
+    </button>
+    <div class="tb-avatar">DT</div>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="page-head">
+    <div class="page-head-left">
+      <div class="page-back-row">
+        <button class="page-back-btn" onclick="showToast('← Back to Apps')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Apps
+        </button>
+        <span class="page-back-sep">/</span>
+        <span class="page-back-current">Billing</span>
+      </div>
+      <h1>Billing</h1>
+      <p>Outstanding balances · updated today at 09:14</p>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-item active" onclick="switchTab('debts',this)">Outstanding debts</button>
+    <button class="tab-item" onclick="switchTab('statements',this)">Generate statements</button>
+    <button class="tab-item" onclick="switchTab('activity',this)">Activity log</button>
+    <button class="tab-item" onclick="switchTab('automation',this)">Automation settings</button>
+  </div>
+
+  <!-- DEBTS TAB -->
+  <div id="tab-debts">
+    <div class="smart-summary" id="smart-summary"></div>
+    <div class="suggestions" id="sug-section"></div>
+
+    <!-- Views strip -->
+    <!-- Custom views & saved filters panel -->
+    <div class="cv-panel" id="cv-panel">
+      <div class="cv-panel-header" onclick="toggleCVPanel()">
+        <div class="cv-panel-header-left">
+          <span class="cv-panel-title">Filters &amp; saved views</span>
+          <span class="cv-panel-count" id="cv-count"></span>
+        </div>
+        <div class="cv-panel-header-right">
+          <span id="cv-active-label" class="cv-active-label"></span>
+          <span class="cv-chev" id="cv-chev">▶</span>
+        </div>
+      </div>
+      <div class="cv-panel-body" id="cv-panel-body"></div>
+    </div>
+
+    <!-- Table -->
+    <div class="tbl-shell">
+      <!-- Row 1: Group by + Sort (above search) -->
+      <div class="tbl-top-bar">
+        <div class="tbl-top-left">
+          <span class="tbl-ctrl-label">Group by</span>
+          <div class="tbl-seg-btns">
+            <button class="tsb active" id="gb-age"    onclick="setGroupBy('age',this)">Age</button>
+            <button class="tsb"        id="gb-status" onclick="setGroupBy('status',this)">Status</button>
+            <button class="tsb"        id="gb-debt"   onclick="setGroupBy('debt',this)">Debt size</button>
+            <button class="tsb"        id="gb-none"   onclick="setGroupBy('none',this)">None</button>
+          </div>
+          <span class="tbl-ctrl-divider"></span>
+          <span class="tbl-ctrl-label">View as</span>
+          <div class="tbl-seg-btns">
+            <button class="tsb active" id="va-clients"  onclick="setViewAs('clients',this)">By client</button>
+            <button class="tsb"        id="va-invoices" onclick="setViewAs('invoices',this)">By invoice</button>
+          </div>
+        </div>
+        <div class="tbl-top-right">
+          <span class="tbl-ctrl-label">Sort by</span>
+          <select class="tbl-sort-select" id="sort-select" onchange="renderDebts()">
+            <option value="priority">Priority</option>
+            <option value="owed_desc">Amount ↓</option>
+            <option value="owed_asc">Amount ↑</option>
+            <option value="age_desc">Oldest first</option>
+            <option value="age_asc">Newest first</option>
+            <option value="name_asc">Name A–Z</option>
+            <option value="contacted_asc">Last contacted</option>
+          </select>
+        </div>
+      </div>
+      <!-- Row 2: Search + Columns + Export -->
+      <div class="tbl-toolbar">
+        <div class="tbl-search">
+          <span class="tbl-search-icon">⌕</span>
+          <input type="text" placeholder="Search clients or email…" id="tbl-search" oninput="renderDebts()"/>
+        </div>
+        <div class="toolbar-right">
+          <div class="col-picker-wrap" id="col-picker-wrap">
+            <button class="col-picker-btn" onclick="toggleColPicker()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Columns
+            </button>
+            <div class="col-picker-dd" id="col-dd"></div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">↓ Export CSV</button>
+        </div>
+      </div>
+      <div id="main-table"></div>
+    </div>
+  </div>
+
+  <!-- STATEMENTS TAB -->
+  <div id="tab-statements" style="display:none">
+    <!-- Top bar: title + date range + presets -->
+    <div class="stmt-bar">
+      <span class="stmt-bar-title">Generate statements</span>
+      <div class="date-range">
+        <span class="dr-label">From</span>
+        <input type="date" class="dr-input" id="stmt-date-from" value="2026-05-01" onchange="stmtDateChange()"/>
+        <span class="dr-sep">→</span>
+        <input type="date" class="dr-input" id="stmt-date-to" value="2026-05-31" onchange="stmtDateChange()"/>
+      </div>
+      <div class="dr-presets">
+        <button class="dr-preset active" id="dp-month" onclick="setStmtPreset('month',this)">This month</button>
+        <button class="dr-preset" id="dp-quarter" onclick="setStmtPreset('quarter',this)">This quarter</button>
+        <button class="dr-preset" id="dp-year" onclick="setStmtPreset('year',this)">This year</button>
+        <button class="dr-preset" id="dp-custom" onclick="setStmtPreset('custom',this)">Custom</button>
+      </div>
+    </div>
+    <div class="stmt-cmd-bar" id="stmt-cmd-bar">
+      <svg class="stmt-cmd-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="stmt-cmd-input" id="stmt-cmd-input" placeholder="What would you like to do?" oninput="stmtCmdInput(this.value)" onfocus="stmtCmdFocus()" onblur="setTimeout(()=>stmtCmdBlur(),150)"/>
+      <span class="stmt-cmd-hint" id="stmt-cmd-hint">Try: <em>generate statements only for clients with remaining debt</em></span>
+    </div>
+    <div class="stmt-cmd-results" id="stmt-cmd-results" style="display:none"></div>
+    <div class="stmt-shell" id="stmt-table"></div>
+  </div>
+
+  <!-- ACTIVITY LOG TAB -->
+  <div id="tab-activity" style="display:none">
+    <div class="al-page-head">
+      <div>
+        <h2 class="al-page-title">Activity log</h2>
+        <p class="al-page-sub">Every action taken — nothing disappears without a trace</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="exportActivityCSV()">↓ Export CSV</button>
+      </div>
+    </div>
+    <!-- Filters -->
+    <div class="al-filter-bar" id="al-filter-bar">
+      <div class="tbl-search" style="max-width:220px">
+        <span class="tbl-search-icon">⌕</span>
+        <input type="text" class="tbl-search" style="padding-left:28px;width:100%" placeholder="Search clients or notes…" id="al-search" oninput="renderActivityLog()"/>
+      </div>
+      <select class="al-filter-select" id="al-filter-type" onchange="renderActivityLog()">
+        <option value="">All types</option>
+        <option value="reminder">Reminders</option>
+        <option value="payment">Payments</option>
+        <option value="note">Notes</option>
+        <option value="call">Calls</option>
+        <option value="credit">Credits applied</option>
+        <option value="invoice">Invoices</option>
+      </select>
+      <select class="al-filter-select" id="al-filter-by" onchange="renderActivityLog()">
+        <option value="">All staff</option>
+        <option value="Daniel Turner">Daniel Turner</option>
+        <option value="Auto">Automated</option>
+      </select>
+      <select class="al-filter-select" id="al-filter-client" onchange="renderActivityLog()">
+        <option value="">All clients</option>
+      </select>
+    </div>
+    <div class="al-global-shell" id="al-global-shell"></div>
+  </div>
+
+  <!-- AUTOMATION TAB -->
+  <div id="tab-automation" style="display:none">
+    <div class="auto-page-head">
+      <div>
+        <h2 class="auto-page-title">Automation settings</h2>
+        <p class="auto-page-sub">Set rules once — the system handles the repetitive work automatically</p>
+      </div>
+    </div>
+
+    <div class="auto-grid">
+
+      <!-- Rule 1: Auto-apply credits -->
+      <div class="auto-card">
+        <div class="auto-card-head">
+          <div class="auto-card-icon" style="background:var(--gs)">✦</div>
+          <div class="auto-card-head-text">
+            <div class="auto-card-title">Auto-apply credits</div>
+            <div class="auto-card-desc">When a client has unallocated credit and an outstanding invoice, the system identifies the match and requests approval before applying.</div>
+          </div>
+          <label class="auto-toggle">
+            <input type="checkbox" checked onchange="autoToggle(this,'credits')"/>
+            <span class="auto-toggle-track"></span>
+          </label>
+        </div>
+        <div class="auto-card-body">
+
+          <!-- Approval step — highlighted -->
+          <div class="auto-approval-box">
+            <div class="auto-approval-header">
+              <span class="auto-approval-icon">🔍</span>
+              <span class="auto-approval-title">Approval required before applying</span>
+            </div>
+            <div class="auto-approval-desc">Before any credit is applied, the system sends a review notification. The approver can approve or reject each case individually.</div>
+            <div class="auto-rule-row" style="margin-top:10px">
+              <span class="auto-rule-label">Notify</span>
+              <select class="auto-select" id="credit-approver">
+                <option>Me (daniel.turner@paddingtonvets.co.uk)</option>
+                <option>Practice manager</option>
+                <option>Any staff member with billing access</option>
+              </select>
+            </div>
+            <div class="auto-rule-row" style="margin-top:8px">
+              <span class="auto-rule-label">Via</span>
+              <select class="auto-select">
+                <option>Email with approve / reject buttons</option>
+                <option>In-app notification only</option>
+                <option>Email + in-app notification</option>
+              </select>
+            </div>
+            <div class="auto-rule-row" style="margin-top:8px">
+              <span class="auto-rule-label">If no response</span>
+              <select class="auto-select">
+                <option>Do nothing — wait for manual approval</option>
+                <option>Auto-approve after 48 hours</option>
+                <option>Auto-approve after 7 days</option>
+                <option>Escalate to practice manager</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Apply to</span>
+            <select class="auto-select">
+              <option>Oldest invoice first</option>
+              <option>Largest invoice first</option>
+              <option>Newest invoice first</option>
+            </select>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Notify client</span>
+            <select class="auto-select">
+              <option>Yes — send email confirmation after applying</option>
+              <option>No — apply silently</option>
+            </select>
+          </div>
+        </div>
+        <div class="auto-card-foot">
+          <span class="auto-rule-summary">Rule: Notify me for approval → apply to oldest invoice → email client</span>
+          <button class="btn btn-outline btn-xs" onclick="showToast('Credits rule saved')">Save</button>
+        </div>
+      </div>
+
+      <!-- Rule 2: Auto-reminder sequence -->
+      <div class="auto-card">
+        <div class="auto-card-head">
+          <div class="auto-card-icon" style="background:var(--bs)">✉</div>
+          <div class="auto-card-head-text">
+            <div class="auto-card-title">Auto-reminder sequence</div>
+            <div class="auto-card-desc">Send personalised reminders automatically at set intervals. The system uses the client's name, amount, and invoice details.</div>
+          </div>
+          <label class="auto-toggle">
+            <input type="checkbox" checked onchange="autoToggle(this,'reminders')"/>
+            <span class="auto-toggle-track"></span>
+          </label>
+        </div>
+        <div class="auto-card-body">
+          <div class="auto-sequence">
+            <div class="auto-seq-step">
+              <span class="auto-seq-dot" style="background:#3b82f6"></span>
+              <span class="auto-seq-label">Day <input type="number" class="auto-num-input" value="7"/></span>
+              <select class="auto-select auto-select-sm">
+                <option>Email</option><option>SMS</option><option>Email + SMS</option>
+              </select>
+              <select class="auto-select auto-select-sm">
+                <option>First reminder template</option><option>Gentle nudge template</option><option>Custom…</option>
+              </select>
+            </div>
+            <div class="auto-seq-step">
+              <span class="auto-seq-dot" style="background:#f59e0b"></span>
+              <span class="auto-seq-label">Day <input type="number" class="auto-num-input" value="14"/></span>
+              <select class="auto-select auto-select-sm">
+                <option>Email</option><option>SMS</option><option selected>Email + SMS</option>
+              </select>
+              <select class="auto-select auto-select-sm">
+                <option>Second reminder template</option><option>Firm reminder template</option><option>Custom…</option>
+              </select>
+            </div>
+            <div class="auto-seq-step">
+              <span class="auto-seq-dot" style="background:#ef4444"></span>
+              <span class="auto-seq-label">Day <input type="number" class="auto-num-input" value="30"/></span>
+              <select class="auto-select auto-select-sm">
+                <option>Email</option><option selected>SMS</option><option>Email + SMS</option>
+              </select>
+              <select class="auto-select auto-select-sm">
+                <option>Final notice template</option><option>Custom…</option>
+              </select>
+            </div>
+            <button class="auto-add-step" onclick="showToast('Step added')">+ Add step</button>
+          </div>
+        </div>
+        <div class="auto-card-foot">
+          <span class="auto-rule-summary">Rule: Email at 7d → Email + SMS at 14d → SMS at 30d</span>
+          <button class="btn btn-outline btn-xs" onclick="showToast('Reminder sequence saved')">Save</button>
+        </div>
+      </div>
+
+      <!-- Rule 3: Escalation -->
+      <div class="auto-card">
+        <div class="auto-card-head">
+          <div class="auto-card-icon" style="background:var(--rs)">⚑</div>
+          <div class="auto-card-head-text">
+            <div class="auto-card-title">Escalation rules</div>
+            <div class="auto-card-desc">If a client remains unresponsive after a set number of contacts or days, flag them for personal follow-up or collections.</div>
+          </div>
+          <label class="auto-toggle">
+            <input type="checkbox" onchange="autoToggle(this,'escalation')"/>
+            <span class="auto-toggle-track"></span>
+          </label>
+        </div>
+        <div class="auto-card-body">
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Escalate after</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="number" class="auto-num-input" value="3" style="width:52px"/> <span style="font-size:12px;color:var(--t2)">failed contacts</span>
+              <span style="font-size:12px;color:var(--t3)">or</span>
+              <input type="number" class="auto-num-input" value="60" style="width:52px"/> <span style="font-size:12px;color:var(--t2)">days outstanding</span>
+            </div>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Action</span>
+            <select class="auto-select">
+              <option>Flag for personal follow-up</option>
+              <option>Move to collections workflow</option>
+              <option>Notify practice manager</option>
+              <option>All of the above</option>
+            </select>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Notify</span>
+            <select class="auto-select">
+              <option>Practice manager by email</option>
+              <option>All staff</option>
+              <option>No notification</option>
+            </select>
+          </div>
+        </div>
+        <div class="auto-card-foot">
+          <span class="auto-rule-summary">Rule: Flag after 3 contacts or 60 days · notify practice manager</span>
+          <button class="btn btn-outline btn-xs" onclick="showToast('Escalation rule saved')">Save</button>
+        </div>
+      </div>
+
+      <!-- Rule 4: Draft invoice alerts -->
+      <div class="auto-card">
+        <div class="auto-card-head">
+          <div class="auto-card-icon" style="background:var(--amber-soft,#fffbeb)">📋</div>
+          <div class="auto-card-head-text">
+            <div class="auto-card-title">Draft invoice alerts</div>
+            <div class="auto-card-desc">Draft invoices can't be sent to clients until finalised. Alert staff when drafts have been sitting unfinalised for too long.</div>
+          </div>
+          <label class="auto-toggle">
+            <input type="checkbox" checked onchange="autoToggle(this,'drafts')"/>
+            <span class="auto-toggle-track"></span>
+          </label>
+        </div>
+        <div class="auto-card-body">
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Alert after</span>
+            <div style="display:flex;align-items:center;gap:6px;flex:1">
+              <input type="number" class="auto-num-input" value="7"/>
+              <span style="font-size:12px;color:var(--t2)">days as draft</span>
+            </div>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Notify</span>
+            <select class="auto-select">
+              <option>The staff member who created the invoice</option>
+              <option>Practice manager</option>
+              <option>All staff with billing access</option>
+            </select>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Via</span>
+            <select class="auto-select">
+              <option>In-app notification</option>
+              <option>Email</option>
+              <option>Email + in-app notification</option>
+            </select>
+          </div>
+          <div class="auto-rule-row">
+            <span class="auto-rule-label">Repeat</span>
+            <select class="auto-select">
+              <option>Once only</option>
+              <option>Every 7 days until finalised</option>
+              <option>Every 14 days until finalised</option>
+            </select>
+          </div>
+        </div>
+        <div class="auto-card-foot">
+          <span class="auto-rule-summary">Rule: Alert creator after 7 days · in-app · remind every 7 days</span>
+          <button class="btn btn-outline btn-xs" onclick="showToast('Draft alert rule saved')">Save</button>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="auto-footnote">All rules are configurable per clinic. Default templates are provided and can be customised at any time.</p>
+  </div>
+</main>
+
+<!-- SEND REMINDER -->
+<div class="overlay" id="m-reminder">
+  <div class="modal">
+    <div class="mh"><div><div class="mh-title" id="rm-title">Send reminder</div><div class="mh-sub" id="rm-sub"></div></div><button class="mh-x" onclick="closeModal('m-reminder')">×</button></div>
+    <div class="mb">
+      <div class="mlabel">Template</div>
+      <div class="tpl-bar">
+        <button class="tpl-opt active" onclick="setTpl(this,0)">First reminder</button>
+        <button class="tpl-opt" onclick="setTpl(this,1)">Second reminder</button>
+        <button class="tpl-opt" onclick="setTpl(this,2)">Final notice</button>
+      </div>
+      <div class="email-compose">
+        <div class="ec-field"><span class="ec-lbl">To</span><input class="ec-val" id="rm-to" readonly/></div>
+        <div class="ec-field"><span class="ec-lbl">Subject</span><input class="ec-val" id="rm-subject"/></div>
+        <div class="ec-field"><span class="ec-lbl">Message</span><textarea class="ec-val" id="rm-body"></textarea></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-reminder')">Cancel</button><button class="btn btn-dark" onclick="confirmReminder()">Send reminder →</button></div>
+  </div>
+</div>
+
+<!-- LOG PAYMENT -->
+<div class="overlay" id="m-payment">
+  <div class="modal modal-lg">
+    <div class="mh"><div><div class="mh-title" id="pm-title">Log payment</div><div class="mh-sub" id="pm-sub"></div></div><button class="mh-x" onclick="closeModal('m-payment')">×</button></div>
+    <div class="mb">
+      <div class="pay-tabs">
+        <button class="pay-tab active" onclick="setPayTab(this,'manual')">Manual</button>
+        <button class="pay-tab" onclick="setPayTab(this,'online')">Online link</button>
+        <button class="pay-tab" onclick="setPayTab(this,'terminal')">Card terminal</button>
+      </div>
+      <div id="pm-manual">
+        <div class="mlabel" style="margin-top:0">Select invoices</div>
+        <div id="pm-inv-list"></div>
+        <div class="mlabel">Amount received</div>
+        <div class="amt-wrap"><span class="amt-sym">£</span><input type="number" class="amt-input" id="pm-amount" placeholder="0.00" oninput="updatePaySum()"/></div>
+        <div class="pay-sum">
+          <div class="psr"><span>Invoices selected</span><span class="psr-v" id="ps-inv">£0.00</span></div>
+          <div class="psr"><span>Credit applied</span><span class="psr-v pos" id="ps-credit">—</span></div>
+          <div class="psr total"><span id="ps-label">Still owed</span><span class="psr-v" id="ps-rem">—</span></div>
+        </div>
+      </div>
+      <div id="pm-online" style="display:none"><div class="tab-placeholder"><div class="tp-icon">🔗</div><div class="tp-title">Send payment link</div><div class="tp-sub">Client receives a secure link to pay online</div><button class="btn btn-dark btn-sm" onclick="showToast('Payment link sent');closeModal('m-payment')">Send by email</button></div></div>
+      <div id="pm-terminal" style="display:none"><div class="tab-placeholder"><div class="tp-icon">💳</div><div class="tp-title">Card terminal</div><div class="tp-sub">Process payment in person using the clinic terminal</div><button class="btn btn-dark btn-sm" onclick="showToast('Terminal session started');closeModal('m-payment')">Start terminal session</button></div></div>
+    </div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-payment')">Cancel</button><button class="btn btn-dark" onclick="confirmPayment()">Confirm payment →</button></div>
+  </div>
+</div>
+
+<!-- ADD NOTE -->
+<div class="overlay" id="m-note">
+  <div class="modal">
+    <div class="mh"><div><div class="mh-title" id="nt-title">Add note</div><div class="mh-sub" id="nt-sub"></div></div><button class="mh-x" onclick="closeModal('m-note')">×</button></div>
+    <div class="mb">
+      <div class="mlabel">What's the situation?</div>
+      <div class="note-grid">
+        <button class="note-opt" onclick="selNote(this,'promised')"><div class="note-opt-icon">🗓</div><div class="note-opt-lbl">Promised to pay</div><div class="note-opt-sub">Set a follow-up date</div></button>
+        <button class="note-opt" onclick="selNote(this,'insurance')"><div class="note-opt-icon">📋</div><div class="note-opt-lbl">Insurance pending</div><div class="note-opt-sub">Waiting on insurer</div></button>
+        <button class="note-opt" onclick="selNote(this,'dispute')"><div class="note-opt-icon">⚠️</div><div class="note-opt-lbl">Disputed invoice</div><div class="note-opt-sub">Client queries the charge</div></button>
+        <button class="note-opt" onclick="selNote(this,'hardship')"><div class="note-opt-icon">🤝</div><div class="note-opt-lbl">Financial hardship</div><div class="note-opt-sub">Payment plan agreed</div></button>
+        <button class="note-opt" onclick="selNote(this,'no_answer')"><div class="note-opt-icon">📵</div><div class="note-opt-lbl">No answer</div><div class="note-opt-sub">Tried calling, no response</div></button>
+        <button class="note-opt" onclick="selNote(this,'refused')"><div class="note-opt-icon">🚫</div><div class="note-opt-lbl">Refused to pay</div><div class="note-opt-sub">Escalate to manager</div></button>
+        <button class="note-opt" onclick="selNote(this,'plan')"><div class="note-opt-icon">📅</div><div class="note-opt-lbl">Payment plan</div><div class="note-opt-sub">Instalments arranged</div></button>
+        <button class="note-opt" onclick="selNote(this,'other')"><div class="note-opt-icon">💬</div><div class="note-opt-lbl">Other</div><div class="note-opt-sub">Free-form note</div></button>
+      </div>
+      <div class="follow-row" id="follow-row"><label>Follow-up date</label><input type="date" class="minput" id="follow-date" style="max-width:160px"/></div>
+      <div class="mlabel">Note</div>
+      <textarea class="minput" id="nt-note" placeholder="Add details about your conversation…"></textarea>
+    </div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-note')">Cancel</button><button class="btn btn-dark" onclick="confirmNote()">Save note →</button></div>
+  </div>
+</div>
+
+<!-- APPLY CREDITS -->
+<div class="overlay" id="m-credits">
+  <div class="modal">
+    <div class="mh"><div><div class="mh-title" id="cr-title">Apply credit</div><div class="mh-sub" id="cr-sub"></div></div><button class="mh-x" onclick="closeModal('m-credits')">×</button></div>
+    <div class="mb"><div id="cr-body"></div></div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-credits')">Cancel</button><button class="btn btn-grn" onclick="confirmCredits()">Apply credit →</button></div>
+  </div>
+</div>
+
+<!-- SAVE VIEW -->
+<div class="overlay" id="m-save-view">
+  <div class="modal">
+    <div class="mh"><div><div class="mh-title">Save current view</div><div class="mh-sub">Give this filter combination a name to reuse it</div></div><button class="mh-x" onclick="closeModal('m-save-view')">×</button></div>
+    <div class="mb">
+      <div class="mlabel">View name</div>
+      <input class="minput" id="sv-name" placeholder="e.g. 30+ days, never contacted"/>
+      <div class="mlabel">Current filters</div>
+      <div class="sv-filter-preview" id="sv-preview"></div>
+    </div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-save-view')">Cancel</button><button class="btn btn-dark" onclick="confirmSaveView()">Save view</button></div>
+  </div>
+</div>
+
+<!-- STATEMENT PREVIEW -->
+<div class="overlay" id="m-statement">
+  <div class="modal modal-xl">
+    <div class="mh"><div><div class="mh-title" id="sp-title">Statement preview</div><div class="mh-sub" id="sp-sub"></div></div><button class="mh-x" onclick="closeModal('m-statement')">×</button></div>
+    <div class="mb" style="padding:0"><div id="sp-body" class="sp"></div></div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal('m-statement')">Close</button><button class="btn btn-outline" onclick="showToast('Statement sent by email')">Send by email</button><button class="btn btn-dark" onclick="showToast('Statement downloaded as PDF')">↓ Download PDF</button></div>
+  </div>
+</div>
+
+<div class="ttp" id="ttp"></div>
+<div class="toast" id="toast"><span>✓</span><span id="toast-msg"></span></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────
+const CLIENTS = [
+  {id:1,name:'Giulio Waters',email:'giulio@paddington.client',owed:923.60,credit:4570.45,invoices:19,age:33,status:'credit',contacted:2,lastContact:'2 May 2026',priority:72,tags:['bad-debtor'],
+   activity:[
+    {id:'a1',date:'2 May 2026',type:'reminder',title:'Second reminder sent',detail:'Email reminder sent automatically — 33 days overdue',by:'Auto',canUndo:true},
+    {id:'a2',date:'20 Apr 2026',type:'reminder',title:'First reminder sent',detail:'Email reminder sent automatically — 20 days overdue',by:'Auto',canUndo:false},
+    {id:'a3',date:'2 Apr 2026',type:'invoice',title:'Invoice #611200 raised',detail:'Achilles · £705.20',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#630644',pet:'Achilles',date:'29 Apr',amount:14.40,age:6,ins:null},{num:'#630636',pet:'Lama Tita',date:'28 Apr',amount:109.60,age:7,ins:null},{num:'#611389',pet:'Aristide',date:'18 Apr',amount:23.60,age:17,ins:null},{num:'#611200',pet:'Achilles',date:'2 Apr',amount:705.20,age:33,ins:null},{num:'#630556',pet:'Pascal',date:'12 Apr',amount:70.80,age:23,ins:'Draft'}]},
+  {id:2,name:'Liam Lee',email:'liam@paddington.client',owed:1320.00,credit:111851.20,invoices:29,age:120,status:'credit',contacted:0,lastContact:null,priority:95,tags:[],
+   activity:[
+    {id:'b1',date:'12 Jan 2026',type:'invoice',title:'Invoice #620011 raised',detail:'Biscuit · £480.00 · Insurance claim filed',by:'Daniel Turner',canUndo:false},
+    {id:'b2',date:'5 Jan 2026',type:'invoice',title:'Invoice #619882 raised',detail:'Milo · £840.00',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#620011',pet:'Biscuit',date:'12 Jan',amount:480.00,age:113,ins:'Insurer'},{num:'#619882',pet:'Milo',date:'5 Jan',amount:840.00,age:120,ins:null}]},
+  {id:3,name:'Marcus Webb',email:'marcus.webb@paddington.client',owed:160.00,credit:0,invoices:1,age:59,status:'waiting',contacted:2,lastContact:'28 Apr 2026',priority:55,tags:[],
+   activity:[
+    {id:'c1',date:'28 Apr 2026',type:'reminder',title:'Second reminder sent',detail:'Email reminder sent automatically — 51 days overdue',by:'Auto',canUndo:true},
+    {id:'c2',date:'10 Apr 2026',type:'reminder',title:'First reminder sent',detail:'Email reminder sent automatically — 33 days overdue',by:'Auto',canUndo:false},
+    {id:'c3',date:'7 Mar 2026',type:'invoice',title:'Invoice #615000 raised',detail:'Unknown · £160.00',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#615000',pet:'Unknown',date:'7 Mar',amount:160.00,age:59,ins:null}]},
+  {id:4,name:'Nora Shackleford',email:'nora@paddington.client',owed:77.79,credit:0,invoices:1,age:90,status:'waiting',contacted:1,lastContact:'15 Apr 2026',priority:40,tags:[],
+   activity:[
+    {id:'d1',date:'15 Apr 2026',type:'note',title:'Note added',detail:'Insurance claim filed. Insurer ref INS-2291. Chase after 15 Jun.',by:'Daniel Turner',canUndo:true},
+    {id:'d2',date:'15 Apr 2026',type:'call',title:'Call logged',detail:'Spoke to client. She confirmed insurance has been filed and expects settlement by June.',by:'Daniel Turner',canUndo:false},
+    {id:'d3',date:'4 Feb 2026',type:'invoice',title:'Invoice #618332 raised',detail:'Luna · £77.79',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#618332',pet:'Luna',date:'4 Feb',amount:77.79,age:90,ins:'Insurer'}]},
+  {id:5,name:'Daisy Clarke',email:'daisy@paddington.client',owed:40.00,credit:60.00,invoices:1,age:18,status:'credit',contacted:0,lastContact:null,priority:30,tags:[],
+   activity:[
+    {id:'e1',date:'17 Apr 2026',type:'payment',title:'Payment received',detail:'£60.00 via Credit/Debit card · Ref PAY-8821',by:'Daniel Turner',canUndo:true},
+    {id:'e2',date:'17 Apr 2026',type:'invoice',title:'Invoice #631002 raised',detail:'Biscuit · £40.00',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#631002',pet:'Biscuit',date:'17 Apr',amount:40.00,age:18,ins:null}]},
+  {id:6,name:'Lisa Daniels',email:'lisa@paddington.client',owed:183.00,credit:0,invoices:1,age:19,status:'new',contacted:0,lastContact:null,priority:68,tags:['bad-debtor'],
+   activity:[
+    {id:'f1',date:'16 Apr 2026',type:'invoice',title:'Invoice #611331 raised',detail:'Dave · £183.00',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#611331',pet:'Dave',date:'16 Apr',amount:183.00,age:19,ins:null}]},
+  {id:7,name:'Anne Smith',email:'anne@paddington.client',owed:45.64,credit:0,invoices:1,age:12,status:'new',contacted:0,lastContact:null,priority:22,tags:[],
+   activity:[
+    {id:'g1',date:'23 Apr 2026',type:'invoice',title:'Invoice #631100 raised',detail:'Sooty · £45.64',by:'Daniel Turner',canUndo:false},
+   ],
+   invoiceList:[{num:'#631100',pet:'Sooty',date:'23 Apr',amount:45.64,age:12,ins:null}]}
+];
+
+const TEMPLATES=[
+  {subject:'Reminder: outstanding balance — Paddington Vets',body:`Dear {first},\n\nYour account at Paddington Vets has an outstanding balance of {amount}. If you have already made payment, please disregard this message. Otherwise, please contact us to arrange settlement.\n\nKind regards,\nPaddington Vets Billing Team`},
+  {subject:'Second reminder: outstanding balance — Paddington Vets',body:`Dear {first},\n\nWe're following up on our previous reminder. Your balance of {amount} remains outstanding. Please get in touch to arrange payment at your earliest convenience.\n\nKind regards,\nPaddington Vets Billing Team`},
+  {subject:'Final notice: outstanding balance — Paddington Vets',body:`Dear {first},\n\nDespite our previous correspondence, your outstanding balance of {amount} has not been settled. This is our final notice before we refer this matter for further action.\n\nPaddington Vets Billing Team`}
+];
+
+const STATUS_LABEL={new:'First contact needed',waiting:'Awaiting reply',credit:'Credits to apply',reason:'On hold'};
+
+// ─── FILTER STATE ────────────────────────────────────────────────────────
+let FILTERS = {statuses:[], ageMin:null, badDebtorOnly:false, hasCreditOnly:false, neverContactedOnly:false};
+
+// ─── SAVED VIEWS ─────────────────────────────────────────────────────────
+let SAVED_VIEWS = [
+  {id:'sv1',name:'30d+ never contacted', filters:{statuses:[],ageMin:30,badDebtorOnly:false,hasCreditOnly:false,neverContactedOnly:true}, groupBy:'age'},
+  {id:'sv2',name:'Has credit to apply',  filters:{statuses:['credit'],ageMin:null,badDebtorOnly:false,hasCreditOnly:true,neverContactedOnly:false}, groupBy:'status'},
+  {id:'sv3',name:'Bad debtors',          filters:{statuses:[],ageMin:null,badDebtorOnly:true,hasCreditOnly:false,neverContactedOnly:false}, groupBy:'none'},
+];
+let activeViewId = null; // null = "All clients"
+
+// ─── COLUMN CONFIG ────────────────────────────────────────────────────────
+let COLS = [
+  {key:'expand',   label:'',              always:true,  show:true,  width:'36px'},
+  {key:'client',   label:'Client',        always:true,  show:true,  width:'1fr'},
+  {key:'owed',     label:'Amount owed',   always:false, show:true,  width:'112px'},
+  {key:'credit',   label:'Credit held',   always:false, show:true,  width:'108px'},
+  {key:'net',      label:'Net owed',      always:false, show:true,  width:'104px'},
+  {key:'age',      label:'Age',           always:false, show:true,  width:'80px'},
+  {key:'contacted',label:'Last contact',  always:false, show:false, width:'115px'},
+  {key:'count',    label:'Invoice count', always:false, show:false, width:'80px'},
+  {key:'tags',     label:'Tags',          always:false, show:false, width:'96px'},
+  {key:'actions',  label:'',              always:true,  show:true,  width:'100px'},
+];
+
+// ─── OTHER STATE ─────────────────────────────────────────────────────────
+let groupBy='age', viewAs='clients';
+const GRP_PAGE_SIZE = 25;
+let grpExpanded = {age0:true,age31:true,age61:true,age91:true,credit:true,new:true,waiting:true,reason:true,d500:true,d100:true,d0:true}; // all open by default
+let grpPage = {};     // groupKey → current page (0-indexed)
+
+function getSortedClients(list){
+  const s = document.getElementById('sort-select')?.value||'priority';
+  const arr = list.slice();
+  if(s==='priority')        arr.sort((a,b)=>b.priority-a.priority);
+  else if(s==='owed_desc')  arr.sort((a,b)=>b.owed-a.owed);
+  else if(s==='owed_asc')   arr.sort((a,b)=>a.owed-b.owed);
+  else if(s==='age_desc')   arr.sort((a,b)=>b.age-a.age);
+  else if(s==='age_asc')    arr.sort((a,b)=>a.age-b.age);
+  else if(s==='name_asc')   arr.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(s==='contacted_asc') arr.sort((a,b)=>(a.lastContact||'').localeCompare(b.lastContact||''));
+  return arr;
+}
+
+function getSortedInvoices(clients){
+  const s = document.getElementById('sort-select')?.value||'priority';
+  const rows = [];
+  clients.forEach(c=> c.invoiceList.forEach(i=> rows.push({...i, client:c})));
+  if(s==='owed_desc'||s==='priority') rows.sort((a,b)=>b.amount-a.amount);
+  else if(s==='owed_asc')  rows.sort((a,b)=>a.amount-b.amount);
+  else if(s==='age_desc')  rows.sort((a,b)=>b.age-a.age);
+  else if(s==='age_asc')   rows.sort((a,b)=>a.age-b.age);
+  else if(s==='name_asc')  rows.sort((a,b)=>a.client.name.localeCompare(b.client.name));
+  return rows;
+}
+
+function renderDebts(){
+  renderFilterChips();
+  const clients = getFilteredClients();
+  const grid = colGrid();
+  let html = '';
+
+  if(viewAs==='invoices'){
+    // Flat invoice list — no client grouping
+    html += renderInvHead();
+    const invs = getSortedInvoices(clients);
+    if(!invs.length){
+      html += `<div class="empty-state">No invoices match the current filters</div>`;
+    } else {
+      invs.forEach(i=> html += renderInvFlatRow(i));
+    }
+    const total = invs.reduce((s,i)=>s+i.amount,0);
+    html += `<div class="tbl-footer"><span>Showing ${invs.length} invoice${invs.length!==1?'s':''} across ${clients.length} client${clients.length!==1?'s':''}</span><span>${fmt(total)} shown</span></div>`;
+    document.getElementById('main-table').innerHTML = html;
+    return;
+  }
+
+  // By-client view — column headers only appear inside each expanded group, not here
+
+  // ── No grouping — flat client list ────────────────────────────────
+  if(groupBy==='none'){
+    const sorted = getSortedClients(clients);
+    html += renderTblHead(grid);
+    if(!sorted.length){
+      html += `<div class="empty-state">No clients match the current filters</div>`;
+    } else {
+      sorted.forEach(c => html += renderRow(c, grid));
+    }
+    const total = sorted.reduce((s,c)=>s+c.owed,0);
+    html += `<div class="tbl-footer"><span>Showing ${sorted.length} of ${CLIENTS.length} clients${filterCount()>0?' (filtered)':''}</span><span>${fmt(total)} shown</span></div>`;
+    document.getElementById('main-table').innerHTML = html;
+    return;
+  }
+
+  const AGE_GROUPS = [
+    {key:'age0', min:0,  max:30,   label:'0–30 days',  sub:'New overdue',           color:'#22c55e', hint:'Send a first reminder'},
+    {key:'age31',min:31, max:60,   label:'31–60 days', sub:'Overdue',               color:'#f59e0b', hint:'Follow up if no response'},
+    {key:'age61',min:61, max:90,   label:'61–90 days', sub:'Significantly overdue', color:'#f97316', hint:'Direct contact needed'},
+    {key:'age91',min:91, max:9999, label:'91+ days',   sub:'Critical',              color:'#ef4444', hint:'Consider escalation'},
+  ];
+  const STATUS_GROUPS = [
+    {key:'credit',  label:'Credits to apply',    sub:'Resolve without chasing', color:'#22c55e', hint:'Apply credit to close balance'},
+    {key:'new',     label:'First contact needed', sub:'Never contacted',         color:'#3b82f6', hint:'Send first reminders'},
+    {key:'waiting', label:'Awaiting reply',       sub:'Contacted, no response',  color:'#f59e0b', hint:'Follow up'},
+    {key:'reason',  label:'On hold',              sub:'Insurance / dispute',     color:'#94a3b8', hint:'Monitor'},
+  ];
+  const DEBT_GROUPS = [
+    {key:'d500', label:'£500+',      sub:'High value',   filter:c=>c.owed>=500,             color:'#ef4444', hint:'Prioritise collection'},
+    {key:'d100', label:'£100–£499',  sub:'Medium value', filter:c=>c.owed>=100&&c.owed<500, color:'#f97316', hint:'Chase this week'},
+    {key:'d0',   label:'Under £100', sub:'Low value',    filter:c=>c.owed<100,              color:'#94a3b8', hint:'Batch contact'},
+  ];
+
+  const groups = groupBy==='age' ? AGE_GROUPS : groupBy==='status' ? STATUS_GROUPS : DEBT_GROUPS;
+
+  const getGrpClients = g => groupBy==='age'
+    ? getSortedClients(clients.filter(c=>c.age>=g.min&&c.age<=g.max))
+    : groupBy==='status'
+    ? getSortedClients(clients.filter(c=>c.status===g.key))
+    : getSortedClients(clients.filter(g.filter));
+
+  // ── Summary cards row ──────────────────────────────────────────────
+  let hasAny = false;
+  html += `<div class="grp-summary-row">`;
+  groups.forEach(g => {
+    const grp = getGrpClients(g);
+    if(!grp.length) return;
+    hasAny = true;
+    const isOpen = !!grpExpanded[g.key];
+    const total = grp.reduce((s,c)=>s+c.owed,0);
+    html += `<div class="grp-card ${isOpen?'active':''}" onclick="toggleGrpExpand('${g.key}')">
+      <div class="grp-card-stripe" style="background:${g.color}"></div>
+      <div class="grp-card-body">
+        <div class="grp-card-label">${g.label}</div>
+        <div class="grp-card-amount">${fmt(total)}</div>
+        <div class="grp-card-meta">${grp.length} client${grp.length!==1?'s':''} · ${g.sub}</div>
+        <div class="grp-card-hint">${g.hint}</div>
+      </div>
+      <div class="grp-card-chev ${isOpen?'open':''}">▼</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // ── Expanded group table with pagination ───────────────────────────
+  groups.forEach(g => {
+    if(!grpExpanded[g.key]) return;
+    const grp = getGrpClients(g);
+    if(!grp.length) return;
+    const page = grpPage[g.key] || 0;
+    const totalPages = Math.ceil(grp.length / GRP_PAGE_SIZE);
+    const pageClients = grp.slice(page * GRP_PAGE_SIZE, (page+1) * GRP_PAGE_SIZE);
+    const total = grp.reduce((s,c)=>s+Math.max(0,c.owed-c.credit),0);
+    html += `<div class="grp-table-shell">
+      <div class="grp-table-head" style="border-left:3px solid ${g.color}">
+        <div class="grp-table-head-left">
+          <span class="grp-table-label" style="color:${g.color}">${g.label}</span>
+          <span class="grp-table-sub">· ${g.sub} · ${grp.length} client${grp.length!==1?'s':''} · ${fmt(total)}</span>
+        </div>
+        <button class="grp-table-close" onclick="toggleGrpExpand('${g.key}')">✕ Collapse</button>
+      </div>
+      ${renderTblHead(grid)}
+      ${pageClients.map(c=>renderRow(c,grid)).join('')}
+      ${totalPages > 1 ? `<div class="grp-pagination">
+        <span class="grp-pg-info">Showing ${page*GRP_PAGE_SIZE+1}–${Math.min((page+1)*GRP_PAGE_SIZE, grp.length)} of ${grp.length} clients</span>
+        <div class="grp-pg-btns">
+          <button class="grp-pg-btn" onclick="setGrpPage('${g.key}',${page-1})" ${page===0?'disabled':''}>← Prev</button>
+          ${Array.from({length:Math.min(totalPages,5)},(_,i)=>{
+            const mid=Math.min(Math.max(page,2),totalPages-3);
+            const p=totalPages<=5?i:[0,mid-1,mid,mid+1,totalPages-1][i];
+            return`<button class="grp-pg-btn ${p===page?'active':''}" onclick="setGrpPage('${g.key}',${p})">${p+1}</button>`;
+          }).join('')}
+          <button class="grp-pg-btn" onclick="setGrpPage('${g.key}',${page+1})" ${page>=totalPages-1?'disabled':''}>Next →</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+  });
+
+  if(!hasAny) html += `<div class="empty-state">No clients match the current filters</div>`;
+  const total = clients.reduce((s,c)=>s+c.owed,0);
+  html += `<div class="tbl-footer"><span>Showing ${clients.length} of ${CLIENTS.length} clients${filterCount()>0?' (filtered)':''}</span><span>${fmt(total)} shown · CSV export reflects this view</span></div>`;
+  document.getElementById('main-table').innerHTML = html;
+}
+
+function renderTblHead(grid){
+  return`<div class="tbl-head" style="grid-template-columns:${grid};position:sticky;top:0;z-index:1">${COLS.filter(c=>c.show).map(c=>{
+    const tips={owed:'Total from finalised overdue invoices',credit:'Prepaid credit — can be applied to any invoice',net:'What the client needs to pay after credit is applied'};
+    return`<div class="th ${['owed','credit','net','age','contacted','count','tags'].includes(c.key)?'r':''}">${c.label}${tips[c.key]?`<span class="th-tip" data-tip="${tips[c.key]}">?</span>`:''}</div>`;
+  }).join('')}</div>`;
+}
+
+const INV_GRID = '90px 1fr 100px 110px 100px 60px 1fr 80px';
+
+function renderInvHead(){
+  return`<div class="tbl-head" style="grid-template-columns:${INV_GRID}">
+    <div class="th">Invoice</div>
+    <div class="th">Client</div>
+    <div class="th">Pet</div>
+    <div class="th r">Date</div>
+    <div class="th r">Amount</div>
+    <div class="th r">Age</div>
+    <div class="th">Status</div>
+    <div class="th">Insurance</div>
+  </div>`;
+}
+
+function renderInvFlatRow(i){
+  const c = i.client;
+  const ins = i.ins ? `<span class="ins-chip ins-${i.ins==='Draft'?'draft':'insurer'}">${i.ins}</span>` : '<span style="color:var(--t3)">—</span>';
+  return`<div class="inv-flat-row" style="grid-template-columns:${INV_GRID}">
+    <div class="inv-td num" style="white-space:nowrap">${i.num}</div>
+    <div style="font-size:13px;font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+    <div class="inv-td">${i.pet}</div>
+    <div class="inv-td r" style="white-space:nowrap">${i.date} 2026</div>
+    <div class="inv-td r bold" style="white-space:nowrap">${fmt(i.amount)}</div>
+    <div class="inv-td r" style="color:${ageCol(i.age)};font-weight:500;white-space:nowrap">${i.age}d</div>
+    <div style="font-size:12px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${STATUS_LABEL[c.status]||c.status}</div>
+    <div class="inv-td">${ins}</div>
+  </div>`;
+}
+
+function setGroupBy(mode, el){
+  groupBy=mode;
+  document.querySelectorAll('.tsb[id^="gb-"]').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderDebts();
+}
+function setViewAs(mode, el){
+  viewAs=mode;
+  document.querySelectorAll('.tsb[id^="va-"]').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  // Hide group-by when viewing by invoice
+  const gbBtns = document.querySelectorAll('.tsb[id^="gb-"]');
+  gbBtns.forEach(b=> b.style.opacity = mode==='invoices'?'0.4':'1');
+  renderDebts();
+}
+let expanded={}, currentClient=null, selInv={}, selectedNote=null, currentPayTab='manual';
+// stmt date managed via #stmt-date-from / #stmt-date-to inputs
+
+// ─── UTILS ───────────────────────────────────────────────────────────────
+const fmt=n=>'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ageCol=a=>a<=30?'var(--grn)':a<=60?'var(--amb)':a<=90?'#c2410c':'var(--red)';
+const ageLabel=a=>a<=30?'0–30 days':a<=60?'31–60 days':a<=90?'61–90 days':'91+ days';
+const colGrid=()=>COLS.filter(c=>c.show).map(c=>c.width).join(' ');
+
+// ─── FILTER LOGIC ────────────────────────────────────────────────────────
+function getFilteredClients(){
+  const q=(document.getElementById('tbl-search')?.value||'').toLowerCase();
+  return CLIENTS.filter(c=>{
+    if(c.owed<=0) return false; // settled — belongs in activity log, not here
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.email.toLowerCase().includes(q))return false;
+    if(FILTERS.statuses.length&&!FILTERS.statuses.includes(c.status))return false;
+    if(FILTERS.ageMin===0&&(c.age<0||c.age>30))return false;
+    if(FILTERS.ageMin!==null&&FILTERS.ageMin>0&&c.age<FILTERS.ageMin)return false;
+    if(FILTERS.badDebtorOnly&&!c.tags.includes('bad-debtor'))return false;
+    if(FILTERS.hasCreditOnly&&c.credit<=0)return false;
+    if(FILTERS.neverContactedOnly&&c.contacted>0)return false;
+    return true;
+  });
+}
+
+function filterCount(){
+  let n=0;
+  if(FILTERS.statuses.length)n++;
+  if(FILTERS.ageMin!==null)n++;
+  if(FILTERS.badDebtorOnly)n++;
+  if(FILTERS.hasCreditOnly)n++;
+  if(FILTERS.neverContactedOnly)n++;
+  return n;
+}
+
+function applyFilter(){
+  // Read checkboxes
+  const statuses=[];
+  if(document.getElementById('f-new')?.checked)statuses.push('new');
+  if(document.getElementById('f-credit')?.checked)statuses.push('credit');
+  if(document.getElementById('f-waiting')?.checked)statuses.push('waiting');
+  if(document.getElementById('f-reason')?.checked)statuses.push('reason');
+  FILTERS.statuses=statuses;
+  FILTERS.badDebtorOnly=!!document.getElementById('f-bad')?.checked;
+  FILTERS.hasCreditOnly=!!document.getElementById('f-hascredit')?.checked;
+  FILTERS.neverContactedOnly=!!document.getElementById('f-never')?.checked;
+  activeViewId=null;
+  renderAll();
+}
+
+function setAgeFilter(min,el){
+  FILTERS.ageMin=min;
+  document.querySelectorAll('.fp-age-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  activeViewId=null;
+  renderAll();
+}
+
+function clearAllFilters(){
+  FILTERS={statuses:[],ageMin:null,badDebtorOnly:false,hasCreditOnly:false,neverContactedOnly:false};
+  ['f-new','f-credit','f-waiting','f-reason','f-bad','f-hascredit','f-never'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
+  document.querySelectorAll('.fp-age-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fa-all')?.classList.add('active');
+  activeViewId=null;
+  renderAll();
+}
+
+function removeFilter(key){
+  if(key==='statuses'){FILTERS.statuses=[];['f-new','f-credit','f-waiting','f-reason'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});}
+  else if(key==='age'){FILTERS.ageMin=null;document.querySelectorAll('.fp-age-btn').forEach(b=>b.classList.remove('active'));document.getElementById('fa-all')?.classList.add('active');}
+  else if(key==='badDebtorOnly'){FILTERS.badDebtorOnly=false;const el=document.getElementById('f-bad');if(el)el.checked=false;}
+  else if(key==='hasCreditOnly'){FILTERS.hasCreditOnly=false;const el=document.getElementById('f-hascredit');if(el)el.checked=false;}
+  else if(key==='neverContactedOnly'){FILTERS.neverContactedOnly=false;const el=document.getElementById('f-never');if(el)el.checked=false;}
+  activeViewId=null;
+  renderAll();
+}
+
+function toggleFilterPanel(){
+  document.getElementById('filter-panel').classList.toggle('open');
+}
+
+// Sync filter panel checkboxes to current FILTERS state
+function syncFilterPanel(){
+  const s=FILTERS.statuses;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.checked=v;};
+  set('f-new',s.includes('new'));set('f-credit',s.includes('credit'));
+  set('f-waiting',s.includes('waiting'));set('f-reason',s.includes('reason'));
+  set('f-bad',FILTERS.badDebtorOnly);set('f-hascredit',FILTERS.hasCreditOnly);set('f-never',FILTERS.neverContactedOnly);
+  document.querySelectorAll('.fp-age-btn').forEach(b=>b.classList.remove('active'));
+  const ageId=FILTERS.ageMin===null?'fa-all':FILTERS.ageMin===0?'fa-0':FILTERS.ageMin===30?'fa-30':FILTERS.ageMin===60?'fa-60':'fa-90';
+  document.getElementById(ageId)?.classList.add('active');
+}
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────
+let cvPanelOpen = false;
+
+// Add isDefault and starred flags to saved views
+SAVED_VIEWS[0].isDefault = true;
+SAVED_VIEWS[0].starred   = true;
+
+function renderViews(){
+  const count = document.getElementById('cv-count');
+  const activeLabel = document.getElementById('cv-active-label');
+  const chev = document.getElementById('cv-chev');
+  if(count)  count.textContent = SAVED_VIEWS.length;
+  if(chev)   chev.className = 'cv-chev' + (cvPanelOpen?' open':'');
+  if(activeLabel){
+    const active = SAVED_VIEWS.find(v=>v.id===activeViewId);
+    activeLabel.innerHTML = active
+      ? `Viewing: <strong>${active.name}</strong>`
+      : (filterCount()>0 ? `<strong>Custom filter active</strong>` : 'Showing your default view');
+  }
+
+  const body = document.getElementById('cv-panel-body');
+  if(!body) return;
+  body.className = 'cv-panel-body' + (cvPanelOpen?' open':'');
+  if(!cvPanelOpen){body.innerHTML='';return;}
+
+  // Build filter state labels for the left column
+  const ageVal   = FILTERS.ageMin!==null ? `${FILTERS.ageMin}+ days overdue` : 'Any age';
+  const statusVal= FILTERS.statuses.length ? FILTERS.statuses.map(s=>({new:'First contact needed',waiting:'Awaiting reply',credit:'Credits to apply',reason:'On hold'}[s]||s)).join(', ') : 'All statuses';
+  const amtVal   = 'Any amount';
+  const contactVal = FILTERS.neverContactedOnly ? 'Never contacted' : FILTERS.hasCreditOnly ? 'Has credit' : FILTERS.badDebtorOnly ? 'Bad debtors only' : 'Any';
+
+  body.innerHTML = `
+    <div class="cv-split">
+      <!-- Left: filter builder -->
+      <div class="cv-filter-col">
+        <div class="cv-filter-title">Filter by</div>
+
+        <div class="cv-filter-field ${FILTERS.ageMin!==null?'active':''}">
+          <div class="cv-ff-label">Age of debt</div>
+          <select class="cv-filter-select" onchange="cvSetAge(this.value)">
+            <option value="">Any age</option>
+            <option value="0"  ${FILTERS.ageMin===0?'selected':''}>0–30 days overdue</option>
+            <option value="30" ${FILTERS.ageMin===30?'selected':''}>30+ days overdue</option>
+            <option value="60" ${FILTERS.ageMin===60?'selected':''}>60+ days overdue</option>
+            <option value="90" ${FILTERS.ageMin===90?'selected':''}>90+ days overdue</option>
+          </select>
+        </div>
+
+        <div class="cv-filter-field ${FILTERS.statuses.length?'active':''}">
+          <div class="cv-ff-label">Status</div>
+          <select class="cv-filter-select" onchange="cvSetStatus(this.value)">
+            <option value="">All statuses</option>
+            <option value="new"     ${FILTERS.statuses.includes('new')?'selected':''}>First contact needed</option>
+            <option value="waiting" ${FILTERS.statuses.includes('waiting')?'selected':''}>Awaiting reply</option>
+            <option value="credit"  ${FILTERS.statuses.includes('credit')?'selected':''}>Credits to apply</option>
+            <option value="reason"  ${FILTERS.statuses.includes('reason')?'selected':''}>On hold</option>
+          </select>
+        </div>
+
+        <div class="cv-filter-field ${FILTERS.neverContactedOnly||FILTERS.hasCreditOnly||FILTERS.badDebtorOnly?'active':''}">
+          <div class="cv-ff-label">Client flag</div>
+          <select class="cv-filter-select" onchange="cvSetFlag(this.value)">
+            <option value="">Any</option>
+            <option value="never"  ${FILTERS.neverContactedOnly?'selected':''}>Never contacted</option>
+            <option value="credit" ${FILTERS.hasCreditOnly?'selected':''}>Has credit on account</option>
+            <option value="bad"    ${FILTERS.badDebtorOnly?'selected':''}>Bad debtors only</option>
+          </select>
+        </div>
+
+        <div class="cv-filter-footer">
+          <button class="btn btn-dark btn-sm" style="flex:1" onclick="cvApplyFilters()">Apply filters</button>
+          <button class="btn btn-outline btn-sm" onclick="cvClearFilters()">Clear</button>
+          <button class="save-view-btn" onclick="openSaveView()" ${filterCount()===0?'disabled title="Apply filters first"':''}>+ Save view</button>
+        </div>
+      </div>
+
+      <!-- Right: saved views -->
+      <div class="cv-views-col">
+        <div class="cv-views-title">Saved views</div>
+        ${SAVED_VIEWS.map(v=>`
+          <div class="cv-view-item ${activeViewId===v.id?'active':''}" onclick="loadView('${v.id}')">
+            <div class="cv-view-item-body">
+              <div class="cv-view-name">
+                ${v.name}
+                ${v.isDefault?'<span class="cv-default-badge">Default</span>':''}
+              </div>
+              <div class="cv-view-desc">${describeFilters(v.filters)} · ${({status:'By status',age:'By age',none:'Flat list'})[v.groupBy]||''}</div>
+            </div>
+            <div class="cv-view-actions" onclick="event.stopPropagation()">
+              <button class="cv-star ${v.starred?'starred':''}" title="${v.starred?'Remove default':'Set as default'}" onclick="cvToggleStar('${v.id}')">★</button>
+              <button class="cv-view-del" title="Delete view" onclick="deleteView('${v.id}')">×</button>
+            </div>
+          </div>`).join('')}
+        <button class="save-view-btn" style="width:100%;margin-top:4px;justify-content:center" onclick="openSaveView()" ${filterCount()===0?'disabled title="Apply filters first to save a view"':''}>+ Save current view as new</button>
+      </div>
+    </div>
+    <div class="cv-footer-note">★ starred view loads by default when you open Billing. Change it any time.</div>`;
+}
+
+function describeFilters(f){
+  const parts=[];
+  if(f.ageMin!==null) parts.push(`${f.ageMin}d+`);
+  if(f.statuses.length) parts.push(f.statuses.join('/'));
+  if(f.neverContactedOnly) parts.push('never contacted');
+  if(f.hasCreditOnly) parts.push('has credit');
+  if(f.badDebtorOnly) parts.push('bad debtors');
+  return parts.length ? parts.join(', ') : 'No filters';
+}
+
+function toggleCVPanel(){
+  cvPanelOpen=!cvPanelOpen;
+  renderViews();
+}
+
+function cvSetAge(val){
+  FILTERS.ageMin = val===''?null:parseInt(val);
+  document.querySelectorAll('.fp-age-btn').forEach(b=>b.classList.remove('active'));
+  const ageId=FILTERS.ageMin===null?'fa-all':FILTERS.ageMin===0?'fa-0':FILTERS.ageMin===30?'fa-30':FILTERS.ageMin===60?'fa-60':'fa-90';
+  document.getElementById(ageId)?.classList.add('active');
+  renderViews();
+}
+function cvSetStatus(val){
+  FILTERS.statuses = val===''?[]:[val];
+  syncFilterPanel();
+  renderViews();
+}
+function cvSetFlag(val){
+  FILTERS.neverContactedOnly = val==='never';
+  FILTERS.hasCreditOnly      = val==='credit';
+  FILTERS.badDebtorOnly      = val==='bad';
+  syncFilterPanel();
+  renderViews();
+}
+function cvApplyFilters(){
+  activeViewId=null;
+  renderAll();
+}
+function cvClearFilters(){
+  clearAllFilters();
+  renderViews();
+}
+function cvToggleStar(id){
+  SAVED_VIEWS.forEach(v=>v.starred=false);
+  SAVED_VIEWS.forEach(v=>v.isDefault=false);
+  const v=SAVED_VIEWS.find(x=>x.id===id);
+  if(v){v.starred=true;v.isDefault=true;}
+  renderViews();
+}
+
+function loadView(id){
+  activeViewId=id;
+  if(id===null){clearAllFilters();return;}
+  const v=SAVED_VIEWS.find(x=>x.id===id);if(!v)return;
+  FILTERS={...v.filters};
+  groupBy=v.groupBy;
+  document.querySelectorAll('.tsb[id^="gb-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('gb-'+groupBy)?.classList.add('active');
+  syncFilterPanel();
+  renderAll();
+}
+
+function deleteView(id){
+  SAVED_VIEWS=SAVED_VIEWS.filter(v=>v.id!==id);
+  if(activeViewId===id){activeViewId=null;clearAllFilters();}
+  else renderAll();
+}
+
+function openSaveView(){
+  document.getElementById('sv-name').value='';
+  // Build preview
+  const lines=[];
+  if(FILTERS.statuses.length)lines.push({key:'Status',val:FILTERS.statuses.map(s=>STATUS_LABEL[s]||s).join(', ')});
+  if(FILTERS.ageMin!==null)lines.push({key:'Age',val:`${FILTERS.ageMin}+ days overdue`});
+  if(FILTERS.badDebtorOnly)lines.push({key:'Flags',val:'Bad debtors only'});
+  if(FILTERS.hasCreditOnly)lines.push({key:'Credit',val:'Has credit on account'});
+  if(FILTERS.neverContactedOnly)lines.push({key:'Contact',val:'Never been contacted'});
+  lines.push({key:'Group by',val:{status:'Status',age:'Age of debt',none:'Flat list'}[groupBy]});
+  document.getElementById('sv-preview').innerHTML=lines.map(l=>`<div class="sv-filter-row"><span class="sv-filter-key">${l.key}</span><span>${l.val}</span></div>`).join('');
+  openModal('m-save-view');
+}
+
+function confirmSaveView(){
+  const name=document.getElementById('sv-name').value.trim();
+  if(!name){showToast('Please enter a name for this view');return;}
+  const id='sv'+Date.now();
+  SAVED_VIEWS.push({id,name,filters:{...FILTERS},groupBy});
+  activeViewId=id;
+  closeModal('m-save-view');
+  showToast(`View "${name}" saved`);
+  renderAll();
+}
+
+// ─── ACTIVE FILTER CHIPS ─────────────────────────────────────────────────
+function renderFilterChips(){
+  // Filter state is now reflected in the cv-panel header label via renderViews()
+  // Nothing else needed here since the toolbar filter button and chips row are removed
+}
+
+// ─── METRICS ─────────────────────────────────────────────────────────────
+function renderMetrics(){
+  const all = CLIENTS;
+  const total      = all.reduce((s,c)=>s+c.owed, 0);
+  const totalInv   = all.reduce((s,c)=>s+c.invoices, 0);
+  const totalClients = all.length;
+
+  // Who didn't pay — has owed > 0 and status isn't 'credit'
+  const unpaid     = all.filter(c=>c.owed>0 && c.status!=='credit');
+  const unpaidAmt  = unpaid.reduce((s,c)=>s+c.owed,0);
+
+  // Never contacted (excluding credit clients who don't need chasing)
+  const uncontacted    = all.filter(c=>c.contacted===0 && c.status!=='credit');
+  const uncontactedAmt = uncontacted.reduce((s,c)=>s+c.owed,0);
+
+  // Has unallocated credits (credit >= owed — can be resolved without a payment call)
+  const hasCredit    = all.filter(c=>c.credit>0 && c.owed>0);
+  const creditAmt    = hasCredit.reduce((s,c)=>s+Math.min(c.credit,c.owed),0);
+
+  // Awaiting reply — contacted but silent
+  const waiting    = all.filter(c=>c.status==='waiting');
+  const waitingAmt = waiting.reduce((s,c)=>s+c.owed,0);
+
+  // Urgency: oldest debt age
+  const oldest = Math.max(...all.map(c=>c.age));
+
+  const chevron = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+  document.getElementById('smart-summary').innerHTML = `
+    <!-- Total outstanding — not clickable -->
+    <div class="ss-total">
+      <span class="ss-total-label">Total outstanding</span>
+      <span class="ss-total-amount">${fmt(total)}</span>
+      <div class="ss-total-meta">
+        <span class="ss-total-meta-item"><strong>${totalClients}</strong> clients</span>
+        <span class="ss-total-meta-item"><strong>${totalInv}</strong> invoices</span>
+        <span class="ss-total-meta-item">Oldest debt <strong>${oldest} days</strong></span>
+      </div>
+    </div>
+
+    <!-- Clickable insight cards -->
+    <div class="ss-cards">
+
+      <!-- Card 1: Who didn't pay -->
+      <div class="ss-card c-unpaid" onclick="smartCardClick('unpaid')">
+        <div class="ss-card-eyebrow">Who didn't pay</div>
+        <div class="ss-card-amount red">${fmt(unpaidAmt)}</div>
+        <div class="ss-card-desc">
+          <strong>${unpaid.length} client${unpaid.length!==1?'s':''}</strong> with outstanding balances.
+          ${unpaid.filter(c=>c.age>=90).length>0?`<strong style="color:var(--red)">${unpaid.filter(c=>c.age>=90).length} overdue 90+ days.</strong>` : unpaid.filter(c=>c.age>=60).length>0?`${unpaid.filter(c=>c.age>=60).length} overdue 60+ days.`:''}
+        </div>
+        <div class="ss-card-action red">View unpaid clients ${chevron}</div>
+      </div>
+
+      <!-- Card 2: Unallocated credits -->
+      <div class="ss-card c-credit" onclick="smartCardClick('credit')">
+        <div class="ss-card-eyebrow">Paid but credit unallocated</div>
+        <div class="ss-card-amount grn">${hasCredit.length>0?fmt(creditAmt):'£0.00'}</div>
+        <div class="ss-card-desc">
+          ${hasCredit.length>0
+            ? `<strong>${hasCredit.length} client${hasCredit.length!==1?'s':''}</strong> have credit that can be applied to invoices. No chasing needed.`
+            : 'No unallocated credits right now. All accounts are balanced.'}
+        </div>
+        <div class="ss-card-action grn">${hasCredit.length>0?'Apply credits now':'All clear'} ${chevron}</div>
+      </div>
+
+      <!-- Card 3: What action to take — dynamic based on data -->
+      ${uncontacted.length>0 ? `
+      <div class="ss-card c-uncontacted" onclick="smartCardClick('uncontacted')">
+        <div class="ss-card-eyebrow">Action needed · first contact</div>
+        <div class="ss-card-amount blu">${fmt(uncontactedAmt)}</div>
+        <div class="ss-card-desc">
+          <strong>${uncontacted.length} client${uncontacted.length!==1?'s':''}</strong> haven't been contacted yet.
+          Send a first reminder to start the collection process.
+        </div>
+        <div class="ss-card-action blu">Send reminders ${chevron}</div>
+      </div>` : waiting.length>0 ? `
+      <div class="ss-card c-waiting" onclick="smartCardClick('waiting')">
+        <div class="ss-card-eyebrow">Action needed · chase up</div>
+        <div class="ss-card-amount amb">${fmt(waitingAmt)}</div>
+        <div class="ss-card-desc">
+          <strong>${waiting.length} client${waiting.length!==1?'s':''}</strong> were contacted but haven't responded.
+          Follow up before debts age further.
+        </div>
+        <div class="ss-card-action amb">Chase clients ${chevron}</div>
+      </div>` : `
+      <div class="ss-card c-credit" style="cursor:default;transform:none!important">
+        <div class="ss-card-eyebrow">Action needed</div>
+        <div class="ss-card-amount grn">All clear</div>
+        <div class="ss-card-desc">All clients have been contacted and there are no urgent follow-ups needed right now.</div>
+      </div>`}
+
+    </div>`;
+}
+
+function smartCardClick(type){
+  // Set the right filter and scroll to table
+  clearAllFilters();
+  if(type==='unpaid'){
+    FILTERS.statuses=['new','waiting','reason'];
+  } else if(type==='credit'){
+    FILTERS.statuses=['credit'];
+    FILTERS.hasCreditOnly=true;
+  } else if(type==='uncontacted'){
+    FILTERS.neverContactedOnly=true;
+  } else if(type==='waiting'){
+    FILTERS.statuses=['waiting'];
+  }
+  syncFilterPanel();
+  renderDebts();
+  renderViews();
+  renderFilterChips();
+  document.querySelector('.tbl-shell')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ─── SUGGESTIONS ─────────────────────────────────────────────────────────
+let sugOpen = true;
+
+function renderSuggestions(){
+  const active = CLIENTS.filter(c=>c.owed>0);
+  const cards = [];
+
+  // 1. Crossed into 91+ days — escalation urgent
+  const newlyCritical = active.filter(c=>c.age>=91&&c.age<=97&&c.status!=='reason');
+  if(newlyCritical.length){
+    const t=newlyCritical.reduce((s,c)=>s+c.owed,0);
+    cards.push({
+      icon:'🚨', bg:'var(--rs)',
+      title:`${newlyCritical.length} client${newlyCritical.length!==1?'s':''} just crossed 90 days — ${fmt(t)} at risk`,
+      sub:`${newlyCritical.map(c=>c.name).join(', ')} · Consider escalation or final notice`,
+      onclick:`showToast('Final notice sent to ${newlyCritical.length} client${newlyCritical.length!==1?'s':''}')`
+    });
+  }
+
+  // 2. 60–90 days, never sent second reminder (contacted < 2)
+  const needsChase = active.filter(c=>c.age>=61&&c.age<=90&&c.contacted<2&&c.status==='waiting');
+  if(needsChase.length){
+    const t=needsChase.reduce((s,c)=>s+c.owed,0);
+    cards.push({
+      icon:'📞', bg:'#fff7ed',
+      title:`${needsChase.length} client${needsChase.length!==1?'s':''} in 60–90 day window need a follow-up call — ${fmt(t)}`,
+      sub:`${needsChase.map(c=>c.name).join(', ')} · Contacted once but no reply`,
+      onclick:`showToast('Follow-up reminders sent to ${needsChase.length} client${needsChase.length!==1?'s':''}')`
+    });
+  }
+
+  // 3. Never been contacted (not credit status) — send first reminder
+  const uncontacted = active.filter(c=>c.contacted===0&&c.status!=='credit');
+  if(uncontacted.length){
+    const t=uncontacted.reduce((s,c)=>s+c.owed,0);
+    cards.push({
+      icon:'✉', bg:'var(--bs)',
+      title:`${uncontacted.length} client${uncontacted.length!==1?'s':''} haven't been contacted yet — ${fmt(t)}`,
+      sub:`${uncontacted.map(c=>c.name).join(', ')} · Send a first reminder to start the process`,
+      onclick:`showToast('First reminders sent to ${uncontacted.length} client${uncontacted.length!==1?'s':''}')`
+    });
+  }
+
+  // 4. Bad debtors over 30 days — demand payment
+  const badDebtors = active.filter(c=>c.tags.includes('bad-debtor')&&c.age>30);
+  if(badDebtors.length){
+    const t=badDebtors.reduce((s,c)=>s+c.owed,0);
+    cards.push({
+      icon:'⚑', bg:'var(--rs)',
+      title:`${badDebtors.length} bad debtor${badDebtors.length!==1?'s':''} with balances over 30 days — ${fmt(t)}`,
+      sub:`${badDebtors.map(c=>c.name).join(', ')} · Send formal demand for payment`,
+      onclick:`showToast('Formal demand sent to ${badDebtors.length} client${badDebtors.length!==1?'s':''}')`
+    });
+  }
+
+  // 5. Single best credit to apply — pick highest owed (skip edge cases > £50k credit)
+  const creditCandidates = active.filter(c=>c.status==='credit'&&c.credit<50000).sort((a,b)=>b.owed-a.owed);
+  if(creditCandidates.length){
+    const c=creditCandidates[0];
+    const net=Math.max(0,c.owed-c.credit);
+    const rest=creditCandidates.length-1;
+    cards.push({
+      icon:'✦', bg:'var(--gs)',
+      title:`${c.name} has ${fmt(c.credit)} credit — ${net===0?'closes case, no payment needed':'reduces balance to '+fmt(net)}`,
+      sub:rest>0?`+${rest} other client${rest!==1?'s':''} with credits to apply`:'Apply to close this case without chasing',
+      onclick:`openCredits(${c.id})`
+    });
+  }
+
+  if(!cards.length){ document.getElementById('sug-section').innerHTML=''; return; }
+
+  const cardHtml = cards.map(s=>`
+    <div class="sg-card" onclick="${s.onclick}">
+      <div class="sg-icon" style="background:${s.bg}">${s.icon}</div>
+      <div class="sg-body">
+        <div class="sg-title">${s.title}</div>
+        <div class="sg-sub">${s.sub}</div>
+      </div>
+      <span class="sg-arrow">→</span>
+    </div>`).join('');
+
+  document.getElementById('sug-section').innerHTML=`
+    <div class="sug-header" onclick="toggleSuggestions()">
+      <span class="sug-title">Suggested actions</span>
+      <span class="sug-count">${cards.length}</span>
+      <span class="sug-chev ${sugOpen?'open':''}">▶</span>
+    </div>
+    ${sugOpen ? `<div class="sug-cards">${cardHtml}</div>` : ''}`;
+}
+
+function toggleSuggestions(){
+  sugOpen=!sugOpen;
+  renderSuggestions();
+}
+
+// ─── COLUMN PICKER ────────────────────────────────────────────────────────
+function renderColPicker(){
+  document.getElementById('col-dd').innerHTML=COLS.filter(c=>c.key!=='expand'&&c.key!=='actions').map(c=>`
+    <div class="cpd-item ${c.always?'locked':''}" onclick="${c.always?'':` toggleCol('${c.key}')`}">
+      <input type="checkbox" ${c.show?'checked':''} ${c.always?'disabled':''}/>
+      <label>${c.label}</label>
+    </div>`).join('');
+}
+function toggleCol(key){const c=COLS.find(x=>x.key===key);if(!c||c.always)return;c.show=!c.show;renderColPicker();renderDebts();}
+function toggleColPicker(){document.getElementById('col-dd').classList.toggle('open');renderColPicker();}
+
+
+
+function renderRow(c,grid){
+  const net=c.owed-c.credit;
+  const isExp=expanded[c.id];
+  const invCount=c.invoiceList.length;
+  const cells=COLS.filter(col=>col.show).map(col=>{
+    if(col.key==='expand')return`<div class="exp-col"><div class="exp-chev ${isExp?'open':''}">▶</div></div>`;
+    if(col.key==='client')return`<div class="c-name-cell"><span class="c-name">${c.name}</span><span class="i-pill">${invCount} inv.</span>${c.tags.includes('bad-debtor')?'<span class="chip chip-bad" style="flex-shrink:0">Bad debtor</span>':''}</div>`;
+    if(col.key==='owed')return`<div class="tv red">${fmt(c.owed)}</div>`;
+    if(col.key==='credit')return`<div class="tv ${c.credit>0?'grn':'muted'}">${c.credit>0?fmt(c.credit):'—'}</div>`;
+    if(col.key==='net')return`<div class="tv ${net>0?'red':'grn'}">${net>0?fmt(net):'surplus'}</div>`;
+    if(col.key==='age')return`<div class="tv-age" style="color:${ageCol(c.age)}">${ageLabel(c.age)}</div>`;
+    if(col.key==='contacted')return`<div><div class="tv-contact">${c.lastContact||'Never'}</div><div class="tv-contact-sub">${c.contacted} contact${c.contacted!==1?'s':''}</div></div>`;
+    if(col.key==='count')return`<div class="tv muted">${c.invoices}</div>`;
+    if(col.key==='tags')return`<div style="text-align:right">${c.tags.map(t=>`<span class="chip chip-bad">${t}</span>`).join('')}</div>`;
+    if(col.key==='actions')return`<div class="row-actions" onclick="event.stopPropagation()">
+      <div class="act-dd-wrap">
+        <button class="btn btn-dark btn-xs act-dd-btn" onclick="toggleActDd(${c.id},event)">Actions ▾</button>
+        <div class="act-dd" id="act-dd-${c.id}">
+          <button class="act-dd-item" onclick="openReminder(${c.id});closeAllActDd()">✉ Send reminder</button>
+          <button class="act-dd-item" onclick="openPayment(${c.id});closeAllActDd()">£ Log payment</button>
+          ${c.credit>0?`<button class="act-dd-item grn" onclick="openCredits(${c.id});closeAllActDd()">✦ Apply credit</button>`:''}
+          <button class="act-dd-item" onclick="openNote(${c.id});closeAllActDd()">+ Add note</button>
+        </div>
+      </div>
+    </div>`;
+    return'<div></div>';
+  }).join('');
+
+  let invExpand='';
+  if(isExp){
+    const expTab = expandedTab[c.id]||'invoices';
+    const invGrid='80px 1fr 90px 70px 80px';
+    const invRows = c.invoiceList.map(i=>`<div class="inv-sub-row-grid" style="display:grid;grid-template-columns:${invGrid};gap:0;align-items:center">
+      <div class="inv-td num">${i.num}</div>
+      <div class="inv-td">${i.pet}${i.ins?`<span class="ins-chip ins-${i.ins==='Draft'?'draft':'insurer'}" style="margin-left:6px">${i.ins}</span>`:''}</div>
+      <div class="inv-td r">${i.date} 2026</div>
+      <div class="inv-td r" style="color:${ageCol(i.age)};font-weight:500">${i.age}d</div>
+      <div class="inv-td r bold">${fmt(i.amount)}</div>
+    </div>`).join('');
+
+    const actRows = (c.activity||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map((a,idx,arr)=>{
+      const cfg = ACTIVITY_CFG[a.type]||ACTIVITY_CFG.note;
+      return`<div class="al-item">
+        <div class="al-dot-col">
+          <div class="al-dot" style="background:${cfg.color}">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${cfg.icon}</svg>
+          </div>
+          ${idx<(arr.length-1)?'<div class="al-line"></div>':''}
+        </div>
+        <div class="al-content">
+          <div class="al-header">
+            <span class="al-date">${a.date}</span>
+            <span class="al-sep">·</span>
+            <span class="al-title">${a.title}</span>
+            <span class="al-by">by ${a.by}</span>
+            ${a.canUndo?`<button class="al-undo" onclick="undoActivity(${c.id},'${a.id}')">Undo</button>`:''}
+          </div>
+          <div class="al-detail">${a.detail}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    invExpand=`<div class="inv-expand">
+      <div class="exp-tabs">
+        <button class="exp-tab ${expTab==='invoices'?'active':''}" onclick="setExpTab(${c.id},'invoices');event.stopPropagation()">
+          Invoices <span class="exp-tab-count">${c.invoiceList.length}</span>
+        </button>
+        <button class="exp-tab ${expTab==='activity'?'active':''}" onclick="setExpTab(${c.id},'activity');event.stopPropagation()">
+          Activity <span class="exp-tab-count">${(c.activity||[]).length}</span>
+        </button>
+        <div class="exp-tabs-right">
+          <span style="font-size:11px;color:var(--t3)">${c.contacted} contact${c.contacted!==1?'s':''} made</span>
+        </div>
+      </div>
+      ${expTab==='invoices'?`
+        <div class="inv-sub-head" style="display:grid;grid-template-columns:${invGrid};gap:0">
+          <div class="inv-th">Invoice</div><div class="inv-th">Pet</div>
+          <div class="inv-th r">Date</div><div class="inv-th r">Age</div><div class="inv-th r">Amount</div>
+        </div>
+        ${invRows}
+      `:`
+        <div class="al-feed">${actRows||'<div style="padding:20px 24px;font-size:13px;color:var(--t3)">No activity recorded yet</div>'}</div>
+        <div class="al-footer">
+          <button class="btn btn-outline btn-xs" onclick="openNote(${c.id});event.stopPropagation()">Add note</button>
+          <button class="btn btn-outline btn-xs" onclick="openReminder(${c.id});event.stopPropagation()">Log reminder</button>
+          <span style="font-size:11px;color:var(--t3);margin-left:auto">Clients stay on this list until their balance is fully resolved</span>
+        </div>
+      `}
+    </div>`;
+  }
+  return`<div class="c-row"><div class="c-row-main" style="grid-template-columns:${grid}" onclick="toggleRow(${c.id})">${cells}</div>${invExpand}</div>`;
+}
+
+function toggleActDd(id, e){
+  e.stopPropagation();
+  const dd = document.getElementById('act-dd-'+id);
+  const wasOpen = dd?.classList.contains('open');
+  closeAllActDd();
+  if(!wasOpen && dd){
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    dd.style.top  = (rect.bottom + 4) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
+    dd.classList.add('open');
+  }
+}
+function closeAllActDd(){
+  document.querySelectorAll('.act-dd.open').forEach(d=>d.classList.remove('open'));
+}
+document.addEventListener('click', closeAllActDd);
+
+function toggleGrpExpand(key){
+  grpExpanded[key] = !grpExpanded[key];
+  if(!grpPage[key]) grpPage[key] = 0;
+  renderDebts();
+}
+
+function setGrpPage(key, page){
+  grpPage[key] = page;
+  renderDebts();
+  // Scroll the expanded group into view
+  setTimeout(()=>{
+    const shell = document.querySelector('.grp-table-shell');
+    if(shell) shell.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 50);
+}
+
+function toggleRow(id){expanded[id]=!expanded[id];renderDebts()}
+
+// ─── ACTIVITY CONFIG ─────────────────────────────────────────────────────
+const ACTIVITY_CFG = {
+  reminder:{color:'#3b82f6',icon:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a2 2 0 012-1.72h3a2 2 0 012 1.72c.127.96.361 1.9.7 2.81a2 2 0 01-.45 2.11L9.91 14a16 16 0 006 6l1.21-1.21a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>'},
+  payment:{color:'#166534',icon:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'},
+  note:{color:'#92400e',icon:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'},
+  call:{color:'#6d4df2',icon:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a2 2 0 012-1.72h3a2 2 0 012 1.72c.127.96.361 1.9.7 2.81a2 2 0 01-.45 2.11L9.91 14a16 16 0 006 6z"/>'},
+  credit:{color:'#166534',icon:'<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>'},
+  invoice:{color:'#a39e97',icon:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>'},
+};
+
+// ─── EXPANDED ROW STATE ───────────────────────────────────────────────────
+let expandedTab = {}; // clientId → 'invoices' | 'activity'
+
+function setExpTab(id, tab){
+  expandedTab[id] = tab;
+  renderDebts();
+}
+
+function undoActivity(clientId, activityId){
+  const c = CLIENTS.find(x=>x.id===clientId);
+  if(!c) return;
+  c.activity = c.activity.filter(a=>a.id!==activityId);
+  showToast('Action undone');
+  renderDebts();
+  renderActivityLog();
+}
+
+// ─── GLOBAL ACTIVITY LOG ──────────────────────────────────────────────────
+let algOpen = {}; // clientId → bool
+
+function renderActivityLog(){
+  const q        = (document.getElementById('al-search')?.value||'').toLowerCase();
+  const typeF    = document.getElementById('al-filter-type')?.value||'';
+  const byF      = document.getElementById('al-filter-by')?.value||'';
+  const clientF  = document.getElementById('al-filter-client')?.value||'';
+
+  // Populate client dropdown once
+  const sel = document.getElementById('al-filter-client');
+  if(sel && sel.options.length === 1){
+    CLIENTS.forEach(c=>{
+      const o = document.createElement('option');
+      o.value = String(c.id);
+      o.textContent = c.name;
+      sel.appendChild(o);
+    });
+  }
+
+  // Collect all events, filtered
+  let allEvents = [];
+  CLIENTS.forEach(c=>{
+    if(clientF && String(c.id)!==clientF) return;
+    (c.activity||[]).forEach(a=>{
+      if(typeF  && a.type!==typeF) return;
+      if(byF    && a.by!==byF) return;
+      if(q && !c.name.toLowerCase().includes(q) && !a.detail.toLowerCase().includes(q) && !a.title.toLowerCase().includes(q)) return;
+      allEvents.push({...a, clientId:c.id, clientName:c.name, clientOwed:c.owed});
+    });
+  });
+
+  // Group by client
+  const byClient = {};
+  allEvents.forEach(e=>{
+    if(!byClient[e.clientId]) byClient[e.clientId]={name:e.clientName,owed:e.clientOwed,events:[]};
+    byClient[e.clientId].events.push(e);
+  });
+  // Sort each client's events: most recent first
+  Object.values(byClient).forEach(g=> g.events.sort((a,b)=>b.date.localeCompare(a.date)));
+
+  const shell = document.getElementById('al-global-shell');
+  if(!shell) return;
+
+  const totalEvents = allEvents.length;
+  // Sort client groups by their most recent event — client with latest activity first
+  const clientIds = Object.keys(byClient).sort((a,b)=>{
+    const latestA = byClient[a].events[0]?.date || '';
+    const latestB = byClient[b].events[0]?.date || '';
+    return latestB.localeCompare(latestA);
+  });
+
+  if(!clientIds.length){
+    shell.innerHTML='<div class="alg-empty">No activity matches your filters</div>';
+    return;
+  }
+
+  let html = clientIds.map(cid=>{
+    const group = byClient[cid];
+    const isOpen = algOpen[cid] !== false; // default open
+    const events = group.events;
+    const feedRows = events.map((a,idx)=>{
+      const cfg = ACTIVITY_CFG[a.type]||ACTIVITY_CFG.note;
+      return`<div class="al-item">
+        <div class="al-dot-col">
+          <div class="al-dot" style="background:${cfg.color}">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${cfg.icon}</svg>
+          </div>
+          ${idx<events.length-1?'<div class="al-line"></div>':''}
+        </div>
+        <div class="al-content">
+          <div class="al-header">
+            <span class="al-date">${a.date}</span>
+            <span class="al-sep">·</span>
+            <span class="al-title">${a.title}</span>
+            <span class="al-by">by ${a.by}</span>
+            ${a.canUndo?`<button class="al-undo" onclick="undoActivity(${a.clientId},'${a.id}')">Undo</button>`:''}
+          </div>
+          <div class="al-detail">${a.detail}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return`<div class="alg-client-block">
+      <div class="alg-client-head" onclick="algToggle('${cid}')">
+        <span class="alg-client-chev ${isOpen?'open':''}">▶</span>
+        <span class="alg-client-name">${group.name}</span>
+        <span class="alg-client-meta">${events.length} event${events.length!==1?'s':''} · ${fmt(group.owed)} outstanding</span>
+      </div>
+      ${isOpen?`<div class="alg-feed">${feedRows}</div>`:''}
+    </div>`;
+  }).join('');
+
+  html += `<div class="al-global-footer">
+    <span>${totalEvents} event${totalEvents!==1?'s':''} across ${clientIds.length} client${clientIds.length!==1?'s':''}</span>
+    <button class="btn btn-outline btn-xs" onclick="exportActivityCSV()">↓ Export CSV</button>
+  </div>`;
+
+  shell.innerHTML = html;
+}
+
+function algToggle(cid){
+  algOpen[cid] = algOpen[cid]===false ? true : false;
+  renderActivityLog();
+}
+
+function exportActivityCSV(){
+  const rows = [];
+  CLIENTS.forEach(c=>{
+    (c.activity||[]).forEach(a=>{
+      rows.push([c.name, c.email, a.date, a.type, a.title, a.detail, a.by]);
+    });
+  });
+  const headers = ['Client','Email','Date','Type','Action','Detail','By'];
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`lupa-activity-log-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Activity log exported');
+}
+function exportCSV(){
+  const clients=getFilteredClients();
+  const filterNote=filterCount()>0?` (filtered: ${filterCount()} filter${filterCount()!==1?'s':''} active)`:'';
+  const headers=['Client name','Email','Amount owed (£)','Credit held (£)','Net owed (£)','Age (days)','Status','Times contacted','Last contact','Invoice count'];
+  const rows=clients.map(c=>[c.name,c.email,c.owed.toFixed(2),c.credit.toFixed(2),Math.max(0,c.owed-c.credit).toFixed(2),c.age,STATUS_LABEL[c.status]||c.status,c.contacted,c.lastContact||'',c.invoices]);
+  const csv=[['Lupa Billing Export'+filterNote,`Generated ${new Date().toLocaleDateString('en-GB')}`],[],...[headers,...rows].map(r=>r.map(v=>`"${v}"`))].map(r=>Array.isArray(r)?r.join(','):r).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`lupa-billing-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+  showToast(`CSV exported — ${clients.length} client${clients.length!==1?'s':''}`);
+}
+
+// ─── STATEMENTS ───────────────────────────────────────────────────────────
+let stmtSortCol = 'name', stmtSortDir = 'asc';
+let stmtColFilters = { invoiced: null, credited: null, remaining: null };
+let stmtExpanded = {};
+let openColFilterKey = null;
+
+// Period helpers
+function stmtDateChange(){ setStmtPreset('custom', document.getElementById('dp-custom')); }
+function setStmtPreset(preset, el){
+  document.querySelectorAll('.dr-preset').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const now = new Date(2026,4,1); // prototype anchor
+  let from, to;
+  if(preset==='month'){
+    from=new Date(now.getFullYear(),now.getMonth(),1);
+    to=new Date(now.getFullYear(),now.getMonth()+1,0);
+  } else if(preset==='quarter'){
+    const q=Math.floor(now.getMonth()/3);
+    from=new Date(now.getFullYear(),q*3,1);
+    to=new Date(now.getFullYear(),q*3+3,0);
+  } else if(preset==='year'){
+    from=new Date(now.getFullYear(),0,1);
+    to=new Date(now.getFullYear(),11,31);
+  } else {
+    renderStatements(); return; // custom — use whatever's in the inputs
+  }
+  const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('stmt-date-from').value=`${from.getFullYear()}-${pad(from.getMonth()+1)}-${pad(from.getDate())}`;
+  document.getElementById('stmt-date-to').value=`${to.getFullYear()}-${pad(to.getMonth()+1)}-${pad(to.getDate())}`;
+  renderStatements();
+}
+
+function stmtPeriodLabel(){
+  const f=document.getElementById('stmt-date-from')?.value||'';
+  const t=document.getElementById('stmt-date-to')?.value||'';
+  if(!f&&!t)return'May 2026';
+  const fmt2=d=>{const x=new Date(d+'T00:00:00');return x.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});};
+  return f===t?fmt2(f):`${fmt2(f)} – ${fmt2(t)}`;
+}
+
+// Sort
+function stmtSort(col){
+  if(stmtSortCol===col)stmtSortDir=stmtSortDir==='asc'?'desc':'asc';
+  else{stmtSortCol=col;stmtSortDir='asc';}
+  renderStatements();
+}
+
+function getStmtSorted(){
+  const arr=CLIENTS.slice();
+  arr.sort((a,b)=>{
+    let va,vb;
+    if(stmtSortCol==='name'){va=a.name.toLowerCase();vb=b.name.toLowerCase();}
+    else if(stmtSortCol==='invoiced'){va=a.owed;vb=b.owed;}
+    else if(stmtSortCol==='credited'){va=Math.min(a.credit,a.owed);vb=Math.min(b.credit,b.owed);}
+    else if(stmtSortCol==='remaining'){va=Math.max(0,a.owed-a.credit);vb=Math.max(0,b.owed-b.credit);}
+    else{va=a.name.toLowerCase();vb=b.name.toLowerCase();}
+    if(va<vb)return stmtSortDir==='asc'?-1:1;
+    if(va>vb)return stmtSortDir==='asc'?1:-1;
+    return 0;
+  });
+  // Apply col filters
+  return arr.filter(c=>{
+    if(stmtColFilters.invoiced!==null&&c.owed!==stmtColFilters.invoiced)return false;
+    if(stmtColFilters.credited!==null&&Math.min(c.credit,c.owed)!==stmtColFilters.credited)return false;
+    if(stmtColFilters.remaining!==null&&Math.max(0,c.owed-c.credit)!==stmtColFilters.remaining)return false;
+    return true;
+  });
+}
+
+function renderStatements(){
+  const period = stmtPeriodLabel();
+  const clients = getStmtSorted();
+  const grid = '36px 28px 220px 1fr 1fr 1fr 120px';
+
+  // Sort icons
+  const si = col => stmtSortCol===col ? (stmtSortDir==='asc'?' ↑':' ↓') : '';
+
+  // Column filter button helper
+  const cfBtn = (key, label) => {
+    const active = stmtColFilters[key]!==null;
+    return `<span class="stmt-th-filter">
+      <button style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:${active?'#6d4df2':'var(--t3)'};display:flex;align-items:center;gap:3px;padding:0" onclick="event.stopPropagation();toggleColFilter('${key}')">
+        ${label}${si(key)}
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="flex-shrink:0;opacity:${active?1:.5}"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        ${active?'<span class="col-filter-dot"></span>':''}
+      </button>
+      <div class="col-filter-dd" id="cfd-${key}"></div>
+    </span>`;
+  };
+
+  let html = `<div class="stmt-toolbar">
+    <span class="stmt-count" id="stmt-toolbar-count">${clients.length} client${clients.length!==1?'s':''} · ${period}</span>
+    <span id="stmt-sel-indicator" style="display:none;font-size:12px;font-weight:500;color:#6d4df2;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:var(--rp);padding:2px 10px"></span>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-outline btn-sm" id="stmt-gen-sel-btn" style="display:none" onclick="showToast('Statements generated for selected clients')">Generate for selected</button>
+      <button class="btn btn-outline btn-sm" onclick="exportStmtCSV()">↓ CSV</button>
+      <button class="btn btn-dark btn-sm" onclick="showToast('Statements generated for all clients in this period')">Generate all</button>
+    </div>
+  </div>
+  <div class="stmt-head stmt-col-grid" style="grid-template-columns:${grid}">
+    <div></div>
+    <div style="display:flex;align-items:center;justify-content:center">
+      <input type="checkbox" id="stmt-select-all" style="accent-color:#6d4df2;width:14px;height:14px;cursor:pointer" onchange="stmtToggleAll(this.checked)" title="Select all"/>
+    </div>
+    <div class="stmt-th ${stmtSortCol==='name'?'sorted':''}" onclick="stmtSort('name')">Client${si('name')}</div>
+    <div class="stmt-th r ${stmtSortCol==='invoiced'?'sorted':''}" style="justify-content:flex-end" onclick="stmtSort('invoiced')">${cfBtn('invoiced','Invoiced')}</div>
+    <div class="stmt-th r ${stmtSortCol==='credited'?'sorted':''}" style="justify-content:flex-end" onclick="stmtSort('credited')">${cfBtn('credited','Credited')}</div>
+    <div class="stmt-th r ${stmtSortCol==='remaining'?'sorted':''}" style="justify-content:flex-end" onclick="stmtSort('remaining')">${cfBtn('remaining','Remaining debt')}</div>
+    <div class="stmt-th r">Actions</div>
+  </div>`;
+
+  if(!clients.length){
+    html+=`<div class="empty-state">No clients match the current filters</div>`;
+  } else {
+    clients.forEach(c=>{
+      const invoiced=c.owed;
+      const credited=Math.min(c.credit,c.owed); // credit applied this period
+      const remaining=Math.max(0,c.owed-c.credit);
+      const isExp=stmtExpanded[c.id];
+      const ledgerGrid='90px 80px 90px 130px 1fr 90px 100px 110px';
+
+      let invRows='';
+      if(isExp){
+        // Build ledger: invoices first, then payments
+        let runBal=0;
+        const ledger=[];
+        c.invoiceList.forEach(i=>{
+          runBal-=i.amount;
+          ledger.push({
+            date:i.date+' 2026', pet:i.pet, type:'Invoice', clinic:'Paddington Vets',
+            desc:i.ins==='Draft'?'Draft — not yet finalised':i.ins==='Insurer'?'Insurance claim pending':'Veterinary services',
+            status:i.ins==='Draft'?'Draft':i.ins==='Insurer'?'Pending':'Completed',
+            amount:-i.amount, balance:runBal, isPayment:false
+          });
+        });
+        if(c.credit>=c.owed&&c.owed>0){
+          runBal+=c.owed;
+          ledger.push({
+            date:'01 May 2026', pet:'—', type:'Payment', clinic:'Paddington Vets',
+            desc:`Card | Payment by ${c.name}`,
+            status:'Success', amount:c.owed, balance:runBal, isPayment:true
+          });
+        }
+
+        const statusStyle=s=>{
+          if(s==='Success'||s==='Completed') return{dot:'var(--grn)',txt:'var(--grn)'};
+          if(s==='Pending'||s==='Draft')     return{dot:'var(--amb)',txt:'var(--amb)'};
+          return{dot:'var(--t3)',txt:'var(--t3)'};
+        };
+
+        const ledgerHead=`<div style="display:grid;grid-template-columns:${ledgerGrid};gap:0;padding:7px 16px 7px 64px;background:#eeece7;border-bottom:1px solid var(--border)">
+          <div class="sc-inv-th">Date</div>
+          <div class="sc-inv-th">Pet</div>
+          <div class="sc-inv-th">Type</div>
+          <div class="sc-inv-th">Clinic</div>
+          <div class="sc-inv-th">Description</div>
+          <div class="sc-inv-th r">Status</div>
+          <div class="sc-inv-th r">Amount</div>
+          <div class="sc-inv-th r">Outstanding</div>
+        </div>`;
+
+        const ledgerRows=ledger.map(row=>{
+          const st=statusStyle(row.status);
+          const amtCol=row.amount>0?'var(--grn)':row.amount<0?'var(--red)':'var(--t3)';
+          const balCol=row.balance<0?'var(--red)':row.balance===0?'var(--grn)':'var(--grn)';
+          return`<div style="display:grid;grid-template-columns:${ledgerGrid};gap:0;padding:9px 16px 9px 64px;border-bottom:1px solid var(--border);align-items:center;background:${row.isPayment?'var(--gs)':'var(--surface2)'}">
+            <div style="font-size:11px;color:var(--t3)">${row.date}</div>
+            <div class="sc-inv-td">${row.pet}</div>
+            <div>
+              <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--rp);background:${row.isPayment?'var(--gb)':'var(--border)'};color:${row.isPayment?'var(--grn)':'var(--t2)'}">
+                ${row.type}
+              </span>
+            </div>
+            <div class="sc-inv-td" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;color:var(--t3);font-size:11px">${row.clinic}</div>
+            <div class="sc-inv-td" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;color:var(--t2)">${row.desc}</div>
+            <div style="text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:5px">
+              <span style="width:5px;height:5px;border-radius:50%;background:${st.dot};flex-shrink:0"></span>
+              <span style="font-size:12px;color:${st.txt}">${row.status}</span>
+            </div>
+            <div style="text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:${amtCol}">${row.amount>0?'+':''}${fmt(Math.abs(row.amount))}</div>
+            <div style="text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:${balCol}">${row.balance===0?'£0.00 ✓':fmt(Math.abs(row.balance))}</div>
+          </div>`;
+        }).join('');
+
+        const ledgerFooter=`<div style="padding:8px 16px 8px 64px;background:var(--surface2);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--t3)">${c.invoiceList.length} invoice${c.invoiceList.length!==1?'s':''}${c.credit>=c.owed&&c.owed>0?' · 1 payment':''}</span>
+          <span style="font-size:12px;font-weight:600;color:${Math.max(0,c.owed-c.credit)>0?'var(--red)':'var(--grn)'}">
+            ${Math.max(0,c.owed-c.credit)>0?fmt(Math.max(0,c.owed-c.credit))+' outstanding':'Fully settled'}
+          </span>
+        </div>`;
+
+        invRows=`<div class="sc-inv-expand">${ledgerHead}${ledgerRows}${ledgerFooter}</div>`;
+      }
+
+      html+=`<div class="sc-row">
+        <div class="sc-main stmt-col-grid" style="grid-template-columns:${grid};display:grid;align-items:center" onclick="stmtToggleRow(${c.id})">
+          <div style="display:flex;align-items:center;justify-content:center">
+            <div class="sc-exp-chev ${isExp?'open':''}">▶</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
+            <input type="checkbox" class="stmt-row-cb" data-id="${c.id}" ${stmtSelected.has(c.id)?'checked':''} style="accent-color:#6d4df2;width:14px;height:14px;cursor:pointer" onchange="stmtRowCheck(${c.id},this.checked)"/>
+          </div>
+          <div class="sc-name-cell">
+            <div>
+              <div class="sc-name"><span class="sc-name-link" onclick="event.stopPropagation();showToast('Opening client record for ${c.name}')" title="Go to client record">${c.name}</span></div>
+              <div class="sc-email">${c.email}</div>
+            </div>
+          </div>
+          <div class="sc-val red">${fmt(invoiced)}</div>
+          <div class="sc-val ${credited>0?'grn':'muted'}">${credited>0?fmt(credited):'—'}</div>
+          <div class="sc-val ${remaining>0?'red':'grn'}">${remaining>0?fmt(remaining):'£0.00'}</div>
+          <div class="sc-actions" onclick="event.stopPropagation()">
+            <button class="icon-btn" title="Preview statement" onclick="previewStatement(${c.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button class="icon-btn" title="Send statement by email" onclick="showToast('Statement sent to ${c.email}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </button>
+            <button class="icon-btn" title="Download PDF" onclick="showToast('PDF downloaded')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+        ${invRows}
+      </div>`;
+    });
+  }
+
+  html+=`<div class="stmt-footer"><span>${clients.length} of ${CLIENTS.length} clients shown</span><span>${period}</span></div>`;
+  document.getElementById('stmt-table').innerHTML=html;
+
+  // Sync select-all checkbox state
+  const sa=document.getElementById('stmt-select-all');
+  if(sa){
+    const allC=clients.every(c=>stmtSelected.has(c.id));
+    const someC=clients.some(c=>stmtSelected.has(c.id));
+    sa.checked=allC&&clients.length>0;
+    sa.indeterminate=someC&&!allC;
+  }
+  const ind=document.getElementById('stmt-sel-indicator');
+  const btn=document.getElementById('stmt-gen-sel-btn');
+  const nSel=[...stmtSelected].filter(id=>clients.find(c=>c.id===id)).length;
+  if(ind){if(nSel>0){ind.style.display='inline';ind.textContent=`${nSel} selected`;}else ind.style.display='none';}
+  if(btn)btn.style.display=nSel>0?'inline-flex':'none';
+
+  // Bind col filter dropdowns
+  ['invoiced','credited','remaining'].forEach(key=>rebuildColFilterDd(key));
+}
+
+function stmtToggleRow(id){ stmtExpanded[id]=!stmtExpanded[id]; renderStatements(); }
+
+let stmtSelected = new Set();
+function stmtToggleAll(checked){
+  const clients = getStmtSorted();
+  if(checked) clients.forEach(c=>stmtSelected.add(c.id));
+  else stmtSelected.clear();
+  renderStatements();
+}
+function stmtRowCheck(id, checked){
+  if(checked) stmtSelected.add(id); else stmtSelected.delete(id);
+  // Update select-all state
+  const clients = getStmtSorted();
+  const allChecked = clients.length>0 && clients.every(c=>stmtSelected.has(c.id));
+  const someChecked = clients.some(c=>stmtSelected.has(c.id));
+  const sa = document.getElementById('stmt-select-all');
+  if(sa){ sa.checked=allChecked; sa.indeterminate=someChecked&&!allChecked; }
+  const ind = document.getElementById('stmt-sel-indicator');
+  const btn = document.getElementById('stmt-gen-sel-btn');
+  const n = [...stmtSelected].filter(id=>clients.find(c=>c.id===id)).length;
+  if(ind){ if(n>0){ind.style.display='inline';ind.textContent=`${n} selected`;}else{ind.style.display='none';} }
+  if(btn){ btn.style.display=n>0?'inline-flex':'none'; }
+}
+
+function toggleColFilter(key){
+  const wasOpen = openColFilterKey===key;
+  // close all
+  document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'));
+  openColFilterKey=null;
+  if(!wasOpen){ const dd=document.getElementById('cfd-'+key); if(dd){dd.classList.add('open');openColFilterKey=key;} }
+}
+
+function rebuildColFilterDd(key){
+  const dd=document.getElementById('cfd-'+key);
+  if(!dd)return;
+  const values=[...new Set(CLIENTS.map(c=>{
+    if(key==='invoiced')return c.owed;
+    if(key==='credited')return Math.min(c.credit,c.owed);
+    return Math.max(0,c.owed-c.credit);
+  }))].sort((a,b)=>a-b);
+
+  dd.innerHTML=`<div class="cfd-item" style="border-bottom:1px solid var(--border);margin-bottom:4px;font-weight:600;color:var(--t2)" onclick="clearColFilter('${key}')">
+    <span style="font-size:12px">Show all</span>
+  </div>`+
+  values.map(v=>`<div class="cfd-item" onclick="setColFilter('${key}',${v})">
+    <input type="checkbox" ${stmtColFilters[key]===v?'checked':''}/>
+    <label>${fmt(v)}</label>
+  </div>`).join('');
+}
+
+function setColFilter(key,val){
+  stmtColFilters[key]=stmtColFilters[key]===val?null:val;
+  document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'));
+  openColFilterKey=null;
+  renderStatements();
+}
+function clearColFilter(key){
+  stmtColFilters[key]=null;
+  document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'));
+  openColFilterKey=null;
+  renderStatements();
+}
+
+function exportStmtCSV(){
+  const period=stmtPeriodLabel();
+  const clients=getStmtSorted();
+  const headers=['Client name','Email','Invoiced (£)','Credited this period (£)','Remaining debt (£)'];
+  const rows=clients.map(c=>[
+    c.name, c.email,
+    c.owed.toFixed(2),
+    Math.min(c.credit,c.owed).toFixed(2),
+    Math.max(0,c.owed-c.credit).toFixed(2)
+  ]);
+  const csv=[
+    [`"Lupa Billing Statements — ${period}"`],
+    [],
+    ...[headers,...rows].map(r=>r.map(v=>`"${v}"`))
+  ].map(r=>Array.isArray(r)?r.join(','):r).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`lupa-statements-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`CSV exported — ${clients.length} client${clients.length!==1?'s':''}`);
+}
+function previewStatement(id){
+  const c=CLIENTS.find(x=>x.id===id);
+  const mLabel=stmtMonth.toLocaleString('en-GB',{month:'long',year:'numeric'});
+  document.getElementById('sp-title').textContent='Statement — '+c.name;
+  document.getElementById('sp-sub').textContent=mLabel;
+  const net=Math.max(0,c.owed-c.credit);
+  const rows=c.invoiceList.map(i=>`<tr><td>${i.date} 2026</td><td>Invoice ${i.num} — ${i.pet}</td><td class="r">${fmt(i.amount)}</td><td class="r">—</td><td class="r bold">${fmt(i.amount)}</td></tr>`).join('');
+  document.getElementById('sp-body').innerHTML=`
+    <div class="sp-name">Paddington Vets</div>
+    <div class="sp-addr">123 Paddington Street · London W2 1AB · billing@paddingtonvets.co.uk · 020 7946 0123</div>
+    <hr class="sp-rule"/>
+    <div class="sp-period">Statement of account · ${mLabel}</div>
+    <div class="sp-title">Account Statement</div>
+    <div class="sp-client-label">Prepared for</div>
+    <div class="sp-client-name">${c.name}</div>
+    <div class="sp-client-email">${c.email}</div>
+    <table class="sp-table">
+      <thead><tr><th>Date</th><th>Description</th><th class="r">Debit</th><th class="r">Credit</th><th class="r">Balance</th></tr></thead>
+      <tbody>
+        <tr><td colspan="4" style="color:#888;font-size:11px">Opening balance</td><td class="r bold">£0.00</td></tr>
+        ${rows}
+        ${c.credit>0?`<tr><td></td><td style="color:#166534">Credit on account</td><td class="r">—</td><td class="r" style="color:#166534">${fmt(c.credit)}</td><td class="r" style="color:#166534">${fmt(c.credit)}</td></tr>`:''}
+      </tbody>
+    </table>
+    <div class="sp-totals">
+      <div class="sp-total-row"><span>Opening balance</span><span>£0.00</span></div>
+      <div class="sp-total-row"><span>Total invoiced</span><span>${fmt(c.owed)}</span></div>
+      <div class="sp-total-row"><span>Payments received</span><span>£0.00</span></div>
+      <div class="sp-total-row"><span>Credit on account</span><span style="color:#166534">${c.credit>0?fmt(c.credit):'£0.00'}</span></div>
+      <div class="sp-total-row final"><span>Amount due</span><span style="color:${net>0?'#b91c1c':'#166534'}">${fmt(net)}</span></div>
+    </div>
+    <div class="sp-footer">Payment is due within 30 days. For queries contact billing@paddingtonvets.co.uk or call 020 7946 0123.<br/>Thank you for your continued trust in Paddington Vets.</div>`;
+  openModal('m-statement');
+}
+
+// ─── MODALS ───────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#col-picker-wrap'))document.getElementById('col-dd').classList.remove('open');
+  if(!e.target.closest('.stmt-th-filter')&&!e.target.closest('.col-filter-dd')){
+    document.querySelectorAll('.col-filter-dd').forEach(d=>d.classList.remove('open'));
+    openColFilterKey=null;
+  }
+});
+
+function openReminder(id){
+  currentClient=id;const c=CLIENTS.find(x=>x.id===id);
+  document.getElementById('rm-title').textContent='Send reminder — '+c.name;
+  document.getElementById('rm-sub').textContent=fmt(c.owed)+' outstanding · '+c.invoices+' invoice'+(c.invoices!==1?'s':'');
+  document.getElementById('rm-to').value=c.email;
+  document.querySelectorAll('.tpl-opt').forEach((b,i)=>b.classList.toggle('active',i===0));
+  applyTpl(0,c);openModal('m-reminder');
+}
+function setTpl(el,idx){document.querySelectorAll('.tpl-opt').forEach(b=>b.classList.remove('active'));el.classList.add('active');const c=CLIENTS.find(x=>x.id===currentClient);if(c)applyTpl(idx,c);}
+function applyTpl(idx,c){const t=TEMPLATES[idx];document.getElementById('rm-subject').value=t.subject;document.getElementById('rm-body').value=t.body.replace('{first}',c.name.split(' ')[0]).replace('{amount}',fmt(c.owed));}
+function confirmReminder(){const c=CLIENTS.find(x=>x.id===currentClient);if(c){c.contacted++;c.lastContact='Today';if(c.status==='new')c.status='waiting';}closeModal('m-reminder');showToast('Reminder sent to '+c.name);renderAll();}
+
+function openPayment(id){
+  currentClient=id;selInv={};
+  const c=CLIENTS.find(x=>x.id===id);
+  document.getElementById('pm-title').textContent='Log payment — '+c.name;
+  document.getElementById('pm-sub').textContent=fmt(c.owed)+' outstanding';
+  document.getElementById('pm-amount').value='';
+  setPayTab(null,'manual');renderPayInvoices();updatePaySum();openModal('m-payment');
+}
+function setPayTab(el,tab){
+  currentPayTab=tab;
+  if(el){document.querySelectorAll('.pay-tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+  ['manual','online','terminal'].forEach(t=>document.getElementById('pm-'+t).style.display=t===tab?'block':'none');
+}
+function renderPayInvoices(){
+  const c=CLIENTS.find(x=>x.id===currentClient);if(!c)return;
+  document.getElementById('pm-inv-list').innerHTML=c.invoiceList.map(i=>{
+    const on=!!selInv[i.num];
+    return`<div class="inv-sel-row ${on?'on':''}" onclick="toggleInv('${i.num}',${i.amount})"><input type="checkbox" ${on?'checked':''} onclick="event.stopPropagation();toggleInv('${i.num}',${i.amount})"><div class="isr-info"><div class="isr-name">${i.num} · ${i.pet}</div><div class="isr-meta">Due ${i.age} days ago · ${i.date} 2026</div></div><div class="isr-amt">${fmt(i.amount)}</div></div>`;
+  }).join('');
+}
+function toggleInv(num,amt){
+  selInv[num]=!selInv[num];const c=CLIENTS.find(x=>x.id===currentClient);
+  renderPayInvoices();
+  const t=c.invoiceList.filter(i=>selInv[i.num]).reduce((s,i)=>s+i.amount,0);
+  document.getElementById('pm-amount').value=t>0?t.toFixed(2):'';updatePaySum();
+}
+function updatePaySum(){
+  const c=CLIENTS.find(x=>x.id===currentClient);if(!c)return;
+  const invT=c.invoiceList.filter(i=>selInv[i.num]).reduce((s,i)=>s+i.amount,0);
+  const payA=parseFloat(document.getElementById('pm-amount').value)||0;
+  const rem=invT-payA;
+  document.getElementById('ps-inv').textContent=fmt(invT);
+  document.getElementById('ps-credit').textContent='—';
+  const re=document.getElementById('ps-rem'),la=document.getElementById('ps-label');
+  re.textContent=fmt(Math.abs(rem));
+  if(rem<=0.005){re.className='psr-v pos';la.textContent='Fully settled ✓';}else{re.className='psr-v neg';la.textContent='Still owed after payment';}
+}
+function confirmPayment(){closeModal('m-payment');showToast('Payment recorded');renderAll();}
+
+function openNote(id){
+  currentClient=id;selectedNote=null;const c=CLIENTS.find(x=>x.id===id);
+  document.getElementById('nt-title').textContent='Add note — '+c.name;
+  document.getElementById('nt-sub').textContent=fmt(c.owed)+' outstanding';
+  document.getElementById('nt-note').value='';
+  document.getElementById('follow-row').classList.remove('show');
+  document.querySelectorAll('.note-opt').forEach(o=>o.classList.remove('sel'));
+  openModal('m-note');
+}
+function selNote(el,type){
+  selectedNote=type;document.querySelectorAll('.note-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');
+  document.getElementById('follow-row').classList.toggle('show',['promised','insurance','hardship','plan'].includes(type));
+}
+function confirmNote(){
+  const c=CLIENTS.find(x=>x.id===currentClient);if(!c)return;
+  if(['insurance','dispute','hardship','plan'].includes(selectedNote))c.status='reason';
+  else if(selectedNote==='no_answer'){c.contacted++;c.lastContact='Today';if(c.status==='new')c.status='waiting';}
+  else if(selectedNote==='refused'){c.contacted++;c.lastContact='Today';}
+  const note=document.getElementById('nt-note').value;
+  if(note||selectedNote)c.notes.unshift({date:'Today',type:'note',text:note||selectedNote});
+  closeModal('m-note');showToast('Note saved');renderAll();
+}
+
+function openCredits(id){
+  currentClient=id;const c=CLIENTS.find(x=>x.id===id);
+  document.getElementById('cr-title').textContent='Apply credit — '+c.name;
+  document.getElementById('cr-sub').textContent=fmt(c.credit)+' credit available';
+  const net=Math.max(0,c.owed-c.credit);
+  document.getElementById('cr-body').innerHTML=`
+    <div class="credit-box">
+      <div class="cb-row"><span>Outstanding balance</span><span>${fmt(c.owed)}</span></div>
+      <div class="cb-row"><span>Credit to apply</span><span>− ${fmt(Math.min(c.credit,c.owed))}</span></div>
+      <div class="cb-row total"><span>${net>0?'Remaining to collect':'Balance after credit'}</span><span style="color:${net>0?'var(--red)':'var(--grn)'}">${net>0?fmt(net):'£0.00 — fully settled'}</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-top:12px">This will apply ${fmt(Math.min(c.credit,c.owed))} of the available credit to ${c.name}'s invoices. ${net===0?'No further payment will be needed.':'A remaining balance of '+fmt(net)+' will still need to be collected.'}</p>`;
+  openModal('m-credits');
+}
+function confirmCredits(){
+  const c=CLIENTS.find(x=>x.id===currentClient);if(!c)return;
+  const applied=Math.min(c.credit,c.owed);
+  const wasFullySettled = applied >= c.owed;
+  c.credit-=applied;c.owed-=applied;
+  if(c.owed<=0) c.status='new';
+
+  // Add to activity log
+  c.activity.unshift({id:'cr'+Date.now(),date:'Today',type:'credit',title:'Credit applied',detail:`${fmt(applied)} credit applied · balance ${c.owed<=0?'fully settled':'reduced to '+fmt(c.owed)}`,by:'Daniel Turner',canUndo:true});
+
+  if(wasFullySettled){
+    // Show removal notice instead of just closing
+    document.getElementById('cr-body').innerHTML=`
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--gs);border:2px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px">✓</div>
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:6px">${fmt(applied)} credit applied</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:20px">Liam Lee's balance is now fully settled.</div>
+        <div style="background:var(--as);border:1px solid var(--ab);border-radius:var(--r);padding:14px 16px;text-align:left">
+          <div style="font-size:12px;font-weight:600;color:var(--amb);margin-bottom:4px">⚠ This client will be removed from the Outstanding Debts table</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.6">Since their balance is £0.00, they'll no longer appear in the billing queue. You can still find their full history — payments, invoices, credits — in the <strong>Activity Log</strong> tab.</div>
+        </div>
+      </div>`;
+    document.querySelector('#m-credits .mf').innerHTML=`
+      <button class="btn btn-outline" onclick="closeModal('m-credits');renderAll()">Close</button>
+      <button class="btn btn-dark" onclick="closeModal('m-credits');switchTab('activity',document.querySelector('.tab-item:nth-child(3)'));renderAll()">View in Activity Log →</button>`;
+  } else {
+    closeModal('m-credits');
+    showToast('Credit applied to '+c.name);
+    renderAll();
+  }
+}
+
+// ─── TOAST + TOOLTIP ──────────────────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
+const ttp=document.getElementById('ttp');
+document.addEventListener('mouseover',e=>{const t=e.target.closest('.th-tip');if(!t)return;ttp.textContent=t.dataset.tip;ttp.classList.add('v')});
+document.addEventListener('mousemove',e=>{if(!ttp.classList.contains('v'))return;const p=12,w=ttp.offsetWidth||160,h=ttp.offsetHeight||40;let x=e.clientX+p,y=e.clientY+p;if(x+w>window.innerWidth-p)x=e.clientX-w-p;if(y+h>window.innerHeight-p)y=e.clientY-h-p;ttp.style.left=x+'px';ttp.style.top=y+'px';});
+document.addEventListener('mouseout',e=>{if(e.target.closest('.th-tip'))ttp.classList.remove('v')});
+
+// ─── TAB SWITCH ───────────────────────────────────────────────────────────
+function switchTab(tab,el){
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-debts').style.display       = tab==='debts'       ? 'block':'none';
+  document.getElementById('tab-statements').style.display  = tab==='statements'  ? 'block':'none';
+  document.getElementById('tab-activity').style.display    = tab==='activity'    ? 'block':'none';
+  document.getElementById('tab-automation').style.display  = tab==='automation'  ? 'block':'none';
+  if(tab==='activity') renderActivityLog();
+}
+
+function autoToggle(checkbox, rule){
+  const card = checkbox.closest('.auto-card');
+  const body = card.querySelector('.auto-card-body');
+  const foot = card.querySelector('.auto-card-foot');
+  if(body) body.style.opacity = checkbox.checked ? '1' : '0.4';
+  if(foot) foot.style.opacity = checkbox.checked ? '1' : '0.4';
+  showToast(rule.charAt(0).toUpperCase()+rule.slice(1)+' automation '+(checkbox.checked?'enabled':'disabled'));
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+// ─── COMMAND BAR ──────────────────────────────────────────────────────────
+const CMD_SUGGESTIONS = [
+  {
+    icon:'✦', iconBg:'var(--gs)', q:'remaining debt',
+    title:'Generate statements only for clients with remaining debt',
+    sub:'Downloads a PDF statement for each client with an open balance',
+    action(){
+      const clients = CLIENTS.filter(c=>Math.max(0,c.owed-c.credit)>0);
+      stmtCmdClear();
+      showToast(`Generating ${clients.length} PDF statement${clients.length!==1?'s':''}…`);
+      setTimeout(()=>showToast(`✓ ${clients.length} statement${clients.length!==1?'s':''} downloaded`), 1800);
+    }
+  },
+  {
+    icon:'✉', iconBg:'var(--bs)', q:'send all',
+    title:'Send statements to all clients',
+    sub:'Emails the current period statement to every client',
+    action(){ showToast('Statements sent to all clients'); stmtCmdClear(); }
+  },
+  {
+    icon:'⬇', iconBg:'var(--surface2)', q:'download',
+    title:'Download all statements as PDF',
+    sub:'Generates a PDF for each client and bundles them',
+    action(){ showToast('PDFs downloaded'); stmtCmdClear(); }
+  },
+  {
+    icon:'✦', iconBg:'var(--gs)', q:'credit',
+    title:'Select clients with credits applied this period',
+    sub:'Filters to clients where credited > £0',
+    action(){ stmtSelected=new Set(CLIENTS.filter(c=>Math.min(c.credit,c.owed)>0).map(c=>c.id)); renderStatements(); stmtCmdClear(); showToast(`${stmtSelected.size} clients selected`); }
+  },
+];
+
+function stmtCmdInput(val){
+  const q=val.toLowerCase().trim();
+  const hint=document.getElementById('stmt-cmd-hint');
+  const res=document.getElementById('stmt-cmd-results');
+  if(!q){res.style.display='none';hint.style.display='inline';return;}
+  hint.style.display='none';
+  const matches=CMD_SUGGESTIONS.filter(s=>s.q.includes(q)||s.title.toLowerCase().includes(q)||q.split(' ').some(w=>s.title.toLowerCase().includes(w)));
+  if(!matches.length){res.style.display='none';return;}
+  res.innerHTML=matches.map((s,i)=>`<div class="scr-item" onclick="CMD_SUGGESTIONS[${CMD_SUGGESTIONS.indexOf(s)}].action()">
+    <div class="scr-item-icon" style="background:${s.iconBg}">${s.icon}</div>
+    <div class="scr-item-body"><div class="scr-item-title">${s.title}</div><div class="scr-item-sub">${s.sub}</div></div>
+    <kbd style="font-size:10px;color:var(--t3);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:2px 6px">↵</kbd>
+  </div>`).join('');
+  res.style.display='block';
+}
+
+function stmtCmdFocus(){
+  document.getElementById('stmt-cmd-hint').style.display='none';
+  const val=document.getElementById('stmt-cmd-input').value;
+  if(!val){
+    const res=document.getElementById('stmt-cmd-results');
+    res.innerHTML=CMD_SUGGESTIONS.map(s=>`<div class="scr-item" onclick="${CMD_SUGGESTIONS.indexOf(s)}; CMD_SUGGESTIONS[${CMD_SUGGESTIONS.indexOf(s)}].action()">
+      <div class="scr-item-icon" style="background:${s.iconBg}">${s.icon}</div>
+      <div class="scr-item-body"><div class="scr-item-title">${s.title}</div><div class="scr-item-sub">${s.sub}</div></div>
+    </div>`).join('');
+    res.style.display='block';
+  }
+}
+
+function stmtCmdBlur(){
+  const inp=document.getElementById('stmt-cmd-input');
+  if(!inp?.value){ document.getElementById('stmt-cmd-hint').style.display='inline'; }
+  document.getElementById('stmt-cmd-results').style.display='none';
+}
+
+function stmtCmdClear(){
+  const inp=document.getElementById('stmt-cmd-input');
+  if(inp)inp.value='';
+  document.getElementById('stmt-cmd-results').style.display='none';
+  document.getElementById('stmt-cmd-hint').style.display='inline';
+}
+
+function renderAll(){renderMetrics();renderSuggestions();renderViews();renderDebts();renderStatements();}
+
+// Auto-load the default (starred) view on init
+(function(){
+  const defaultView = SAVED_VIEWS.find(v=>v.isDefault||v.starred);
+  if(defaultView){
+    activeViewId = defaultView.id;
+    FILTERS = {...defaultView.filters};
+    groupBy = defaultView.groupBy;
+    document.querySelectorAll('.tsb[id^="gb-"]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('gb-'+groupBy)?.classList.add('active');
+    syncFilterPanel();
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
